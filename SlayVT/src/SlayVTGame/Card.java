@@ -1,58 +1,123 @@
 package SlayVTGame;
-import java.util.*;
+
+import java.util.ArrayList;
 
 public class Card
 {
-    //~ Fields ................................................................
     private String name;
     private int cost;
     private String type;
     private CardEffect effect;
-    //~ Constructors ..........................................................
-    public Card(int num) {
-        if (num == 1) {
-            name = "Strike";
-            cost = 1;
-            type = "Attack";
-            effect = new DamageEffect(6);
-        } else {
-            name = "Defend";
-            cost = 1;
-            type = "Skill";
-            effect = new BlockEffect(5);
-        }
+
+    public Card(CardLibrary cardType)
+    {
+        name = cardType.getName();
+        cost = cardType.getCost();
+        type = cardType.getType();
+        effect = cardType.createEffect();
     }
-    //~Public  Methods ........................................................
-    public String getName() {
+
+    public String getName()
+    {
         return name;
     }
 
-    public int getCost() {
+    public int getCost()
+    {
         return cost;
     }
 
-    public void setCost(int cost) {
+    public void setCost(int cost)
+    {
+        if (cost < 0)
+        {
+            throw new IllegalArgumentException("Cost must not be negative.");
+        }
+
         this.cost = cost;
     }
 
-    public String getType() {
+    public String getType()
+    {
         return type;
     }
 
-    public String getEffect() {
+    public String getEffect()
+    {
         return effect.toString();
     }
-    
-    public void apply(Player player, Enemy enemy) {
+
+    public boolean requiresEnemyTarget()
+    {
+        return effect.requiresEnemyTarget();
+    }
+
+    public void apply(Player player, Enemy enemy)
+    {
+        if (requiresEnemyTarget()
+            && (enemy == null || !enemy.checkAlive()))
+        {
+            throw new IllegalArgumentException(
+                "A living enemy target is required.");
+        }
+
+        if (player.getEnergy() < cost)
+        {
+            throw new IllegalStateException("Not enough energy.");
+        }
+
         player.spendEnergy(cost);
         effect.apply(player, enemy);
     }
-    
-    public void apply(Player player, ArrayList<Enemy> enemies) {
+
+    // Explicit multi-target application; self effects execute only once.
+    public void apply(Player player, ArrayList<Enemy> enemies)
+    {
+        if (!requiresEnemyTarget())
+        {
+            apply(player, (Enemy)null);
+            return;
+        }
+
+        if (enemies == null)
+        {
+            throw new IllegalArgumentException("Enemies must not be null.");
+        }
+
+        ArrayList<Enemy> targets = new ArrayList<Enemy>();
+
+        for (Enemy enemy : enemies)
+        {
+            if (enemy != null && enemy.checkAlive())
+            {
+                targets.add(enemy);
+            }
+        }
+
+        if (targets.isEmpty())
+        {
+            throw new IllegalArgumentException(
+                "At least one living enemy target is required.");
+        }
+
+        if (player.getEnergy() < cost)
+        {
+            throw new IllegalStateException("Not enough energy.");
+        }
+
         player.spendEnergy(cost);
-        for(int i = 0; i < enemies.size(); i++) {
-            Enemy temp = enemies.get(i);
-            effect.apply(player, temp);
+
+        for (Enemy enemy : targets)
+        {
+            if (!player.checkAlive())
+            {
+                break;
+            }
+
+            if (enemy.checkAlive())
+            {
+                effect.apply(player, enemy);
+            }
         }
     }
 }

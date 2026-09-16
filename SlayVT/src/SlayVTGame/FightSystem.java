@@ -1,101 +1,181 @@
 package SlayVTGame;
+
 import static SlayVTGame.ToolClass.*;
 import java.util.ArrayList;
 
 public class FightSystem
 {
-    //~ Fields ................................................................
-    private Player player;
-    private Enemy[] enemies;
-    private Deck deck;
-    private static ArrayList<Card> hand = new ArrayList<Card>();
-    private static ArrayList<Card> drawPile = new ArrayList<Card>();
-    private static ArrayList<Card> discardPile = new ArrayList<Card>();
-    //~ Constructors ..........................................................
-    //~Public  Methods ........................................................
-    public boolean fight(Player player, ArrayList<Enemy> enemies, Deck deck) {
-        int turn = 1;
-        boolean ifEnds = false;
-        this.player = player;
-        this.enemies = new Enemy[enemies.size()];
-        for (int i = 0; i < enemies.size(); i++) {
-            this.enemies[i] = enemies.get(i);
+    private final ArrayList<Card> hand = new ArrayList<Card>();
+    private final ArrayList<Card> drawPile = new ArrayList<Card>();
+    private final ArrayList<Card> discardPile = new ArrayList<Card>();
+
+    public boolean fight(
+        Player player, ArrayList<Enemy> enemies, Deck deck)
+    {
+        hand.clear();
+        drawPile.clear();
+        discardPile.clear();
+
+        player.getBuffs().clear();
+        player.setBlock(0);
+
+        for (Enemy enemy : enemies)
+        {
+            enemy.getBuffs().clear();
+            enemy.setBlock(0);
         }
-        this.deck = deck;
+
         for (Card card : deck.getDeck())
         {
             drawPile.add(card);
         }
-        while (player.checkAlive() && !ifEnds)
+
+        int turn = 1;
+
+        while (player.checkAlive() && hasLivingEnemies(enemies))
         {
-            for (int i = 0; i < 5; i++)
-            {
-                drawCardFromPile(drawPile, hand, discardPile);
-            }
             println("Turn " + turn);
-            // Turn starts
+
+            player.getBuffs().startTurn();
             player.setBlock(0);
             player.setEnergy(player.getMaxEnergy());
-            while(true)
+
+            while (hand.size() < 5)
             {
-                printPlayer(player);
-                printEnemies(enemies);
-                println("");
-                int opt = askOption(printOptions(hand),0,hand.size());
-                if (opt == 0) // player choose end turn
+                if (drawPile.isEmpty() && discardPile.isEmpty())
                 {
                     break;
                 }
-                Card chosenCard = hand.get(opt - 1);
+
+                drawCardFromPile(drawPile, hand, discardPile);
+            }
+
+            while (player.checkAlive() && hasLivingEnemies(enemies))
+            {
+                printPlayer(player);
+                println("Your statuses: " + player.getBuffs());
+
+                printEnemies(enemies);
+
+                for (Enemy enemy : enemies)
+                {
+                    if (enemy.checkAlive())
+                    {
+                        println(enemy.getName() + " statuses: "
+                            + enemy.getBuffs());
+                    }
+                }
+
+                println("");
+
+                int option = askOption(printOptions(hand), 0, hand.size());
+
+                if (option == 0)
+                {
+                    break;
+                }
+
+                Card chosenCard = hand.get(option - 1);
+
                 if (chosenCard.getCost() > player.getEnergy())
                 {
                     println("You don't have enough Energy.");
                     continue;
                 }
-                if (chosenCard.getType().equals("Attack"))
+
+                if (chosenCard.requiresEnemyTarget())
                 {
-                    int enemyopt = askOption(printEnemyOption(enemies),0,enemies.size());
-                    if (enemyopt == 0)
+                    ArrayList<Enemy> targets = new ArrayList<Enemy>();
+
+                    for (Enemy enemy : enemies)
+                    {
+                        if (enemy.checkAlive())
+                        {
+                            targets.add(enemy);
+                        }
+                    }
+
+                    int targetOption = askOption(
+                        printEnemyOption(targets), 0, targets.size());
+
+                    if (targetOption == 0)
                     {
                         continue;
                     }
-                    Enemy chosenEnemy = enemies.get(enemyopt - 1);
-                    chosenCard.apply(player, chosenEnemy);
+
+                    chosenCard.apply(player, targets.get(targetOption - 1));
                 }
-                else if (chosenCard.getType().equals("Skill"))
+                else
                 {
-                    chosenCard.apply(player, enemies);
+                    chosenCard.apply(player, (Enemy)null);
                 }
+
                 discardPile.add(chosenCard);
-                hand.remove(opt - 1);
-                // detect if ends
-                for (Enemy e: enemies) {
-                    ifEnds = true;
-                    if (e.checkAlive()) {
-                        ifEnds = false;
-                    }
-                }
-                if (ifEnds) {
-                    break;
-                }
+                hand.remove(option - 1);
             }
-            // Turn ends
-            for (int i = 0; i < hand.size(); i++)
-            {
-                discardPile.add(hand.get(i));
-            }
+
+            discardPile.addAll(hand);
             hand.clear();
-            if (ifEnds) {
+
+            if (!player.checkAlive() || !hasLivingEnemies(enemies))
+            {
                 break;
             }
-            for (int i = 0; i < enemies.size(); i++)
+
+            player.getBuffs().endTurn();
+
+            for (Enemy enemy : enemies)
             {
-                Enemy temp = enemies.get(i);
-                player.takeDamage(temp.getDmg());
-                temp.setBlock(0);
+                if (!player.checkAlive())
+                {
+                    break;
+                }
+
+                if (!enemy.checkAlive())
+                {
+                    continue;
+                }
+
+                enemy.getBuffs().startTurn();
+                enemy.setBlock(0);
+
+                int damage = Buffs.calculateDamage(
+                    enemy.getDmg(), enemy.getBuffs(), player.getBuffs());
+
+                player.takeDamage(damage);
+                enemy.getBuffs().endTurn();
             }
+
             turn++;
         }
-        return player.checkAlive();
+
+        boolean won = player.checkAlive() && !hasLivingEnemies(enemies);
+
+        hand.clear();
+        drawPile.clear();
+        discardPile.clear();
+
+        player.setBlock(0);
+        player.getBuffs().clear();
+
+        for (Enemy enemy : enemies)
+        {
+            enemy.getBuffs().clear();
+        }
+
+        return won;
+    }
+
+    private boolean hasLivingEnemies(ArrayList<Enemy> enemies)
+    {
+        for (Enemy enemy : enemies)
+        {
+            if (enemy.checkAlive())
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

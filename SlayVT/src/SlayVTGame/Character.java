@@ -2,73 +2,95 @@ package SlayVTGame;
 
 public class Character
 {
-    // ~ Fields ................................................................
     private String name;
     private int hp;
     private int maxHp;
     private int block;
-    private boolean ifAlive;
+    private final Buffs buffs;
 
-    // ~ Constructors ..........................................................
     public Character(String name, int maxHp)
     {
+        if (maxHp <= 0)
+        {
+            throw new IllegalArgumentException(
+                "Maximum HP must be positive.");
+        }
+
         this.name = name;
         this.maxHp = maxHp;
-        this.hp = maxHp;
-        this.block = 0;
-        this.ifAlive = true;
+        hp = maxHp;
+        block = 0;
+        buffs = new Buffs();
     }
 
-
-    // ~Public Methods ........................................................
-    public void takeDamage(int dmg)
+    // Damage modifiers are applied before calling this method.
+    public void takeDamage(int damage)
     {
-        if (dmg <= block)
+        if (damage < 0)
         {
-            block -= dmg;
+            throw new IllegalArgumentException(
+                "Damage must not be negative.");
         }
-        else
-        {
-            dmg -= block;
-            block = 0;
-            hp -= dmg;
-        }
+
+        int absorbed = Math.min(block, damage);
+        block -= absorbed;
+        hp = Math.max(0, hp - (damage - absorbed));
     }
-    
-    public boolean checkAlive() {
-        if(hp <= 0) {
-            ifAlive = false;
-        }else {
-            ifAlive = true;
-        }
-        return ifAlive;
+
+    public boolean checkAlive()
+    {
+        return hp > 0;
     }
-    
-    public String getName() {
+
+    public String getName()
+    {
         return name;
     }
 
-    public int getHp() {
+    public int getHp()
+    {
         return hp;
     }
 
-    public int getMaxHp() {
+    public int getMaxHp()
+    {
         return maxHp;
     }
 
-    public int getBlock() {
+    public int getBlock()
+    {
         return block;
     }
-    
-    public void addBlock(int block) {
-        this.block += block;
+
+    public void addBlock(int amount)
+    {
+        if (amount < 0)
+        {
+            throw new IllegalArgumentException(
+                "Block must not be negative.");
+        }
+
+        block += amount;
     }
-    
-    public void setBlock(int block) {
+
+    public void setBlock(int block)
+    {
+        if (block < 0)
+        {
+            throw new IllegalArgumentException(
+                "Block must not be negative.");
+        }
+
         this.block = block;
     }
 
-    public boolean getIfAlive() {
-        return ifAlive;
+    public boolean getIfAlive()
+    {
+        return checkAlive();
+    }
+
+    public Buffs getBuffs()
+    {
+        return buffs;
     }
 }
