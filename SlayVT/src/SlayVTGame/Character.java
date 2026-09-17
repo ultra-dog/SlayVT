@@ -6,7 +6,7 @@ public class Character
     private int hp;
     private int maxHp;
     private int block;
-    private final Buffs buffs;
+    private Buffs buffs;
 
     public Character(String name, int maxHp)
     {

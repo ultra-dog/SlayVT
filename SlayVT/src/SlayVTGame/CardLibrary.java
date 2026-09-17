@@ -1,11 +1,12 @@
 package SlayVTGame;
+import SlayVTGame.BuffEffect.BuffType;
 
 public enum CardLibrary
 {
     STRIKE("Strike", 1, "Attack"),
     DEFEND("Defend", 1, "Skill"),
     BREEZE("Breeze", 1, "Skill"),
-    BURN("Burn", 1, "Attack");
+    BURN("Burn", 1, "Skill");
 
     private final String name;
     private final int cost;
@@ -42,9 +43,9 @@ public enum CardLibrary
             case DEFEND:
                 return new BlockEffect(5);
             case BREEZE:
-                return new BlockEffect(4);
+                return new BuffEffect(BuffType.TEMPERATURE, -2);
             case BURN:
-                return new DamageEffect(5);
+                return new BuffEffect(BuffType.TEMPERATURE, 2);
             default:
                 throw new IllegalStateException("Unknown card: " + this);
         }

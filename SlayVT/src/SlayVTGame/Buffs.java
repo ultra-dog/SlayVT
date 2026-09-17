@@ -1,6 +1,5 @@
 package SlayVTGame;
-
-import java.util.StringJoiner;
+import java.util.*;
 
 public class Buffs
 {
@@ -48,10 +47,30 @@ public class Buffs
         return temperature;
     }
 
-    // Temperature effects and stacking rules are not implemented yet.
-    public void setTemperature(int temperature)
+    public int setTemperature(int temperature)
     {
-        this.temperature = temperature;
+        if (temperature > 0) {
+            if (this.temperature > 0) {
+                this.temperature += temperature;
+            } else {
+                int tempDiff = 0;
+                tempDiff = Math.abs(this.temperature - temperature);
+                this.temperature = temperature;
+                return tempDiff;
+            }
+        } else if (temperature < 0) {
+            if (this.temperature < 0) {
+                this.temperature += temperature;
+            } else {
+                int tempDiff = 0;
+                tempDiff = Math.abs(this.temperature - temperature);
+                this.temperature = temperature;
+                return tempDiff;
+            }
+        } else {
+            this.temperature = temperature;
+        }
+        return 0;
     }
 
     public static int calculateDamage(
@@ -77,6 +96,31 @@ public class Buffs
         }
 
         return (int)Math.floor(damage);
+    }
+    
+    public static int calculateDamage(
+        int baseDamage, int hitCount, Buffs attacker, Buffs target)
+    {
+        requireNonNegative(baseDamage);
+
+        if (attacker == null || target == null)
+        {
+            throw new IllegalArgumentException("Buffs must not be null.");
+        }
+
+        double damage = baseDamage;
+
+        if (attacker.isWeak())
+        {
+            damage *= 0.75;
+        }
+
+        if (target.isVulnerable())
+        {
+            damage *= 1.5;
+        }
+
+        return (int)Math.floor(damage) * hitCount;
     }
 
     public void startTurn()

@@ -53,19 +53,7 @@ public class FightSystem
             while (player.checkAlive() && hasLivingEnemies(enemies))
             {
                 printPlayer(player);
-                println("Your statuses: " + player.getBuffs());
-
                 printEnemies(enemies);
-
-                for (Enemy enemy : enemies)
-                {
-                    if (enemy.checkAlive())
-                    {
-                        println(enemy.getName() + " statuses: "
-                            + enemy.getBuffs());
-                    }
-                }
-
                 println("");
 
                 int option = askOption(printOptions(hand), 0, hand.size());

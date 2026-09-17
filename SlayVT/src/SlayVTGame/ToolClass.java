@@ -1,4 +1,5 @@
 package SlayVTGame;
+import static SlayVTGame.ToolClass.*;
 import java.util.*;
 
 public final class ToolClass
@@ -64,6 +65,10 @@ public final class ToolClass
         println(
             " Energy: (" + player.getEnergy() + "/" + player.getMaxEnergy()
                 + ")");
+        if (player.checkAlive() && player.getBuffs().toString() != "None")
+        {
+            println("Your statuses: " + player.getBuffs());
+        }
     }
 
 
@@ -75,6 +80,11 @@ public final class ToolClass
             println(
                 temp.getName() + " HP: " + temp.getHp() + "/" + temp.getMaxHp()
                     + " intends to Hit " + temp.getDmg());
+            if (temp.checkAlive() && temp.getBuffs().toString() != "None")
+            {
+                println(temp.getName() + " statuses: "
+                    + temp.getBuffs());
+            }
         }
     }
 
