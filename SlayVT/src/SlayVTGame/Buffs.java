@@ -47,29 +47,21 @@ public class Buffs
         return temperature;
     }
 
+    // Returns the temperature difference only for a hot/cold reversal.
     public int setTemperature(int temperature)
     {
-        if (temperature > 0) {
-            if (this.temperature > 0) {
-                this.temperature += temperature;
-            } else {
-                int tempDiff = 0;
-                tempDiff = Math.abs(this.temperature - temperature);
-                this.temperature = temperature;
-                return tempDiff;
-            }
-        } else if (temperature < 0) {
-            if (this.temperature < 0) {
-                this.temperature += temperature;
-            } else {
-                int tempDiff = 0;
-                tempDiff = Math.abs(this.temperature - temperature);
-                this.temperature = temperature;
-                return tempDiff;
-            }
-        } else {
+        boolean oppositeTemperatures =
+            (this.temperature > 0 && temperature < 0)
+            || (this.temperature < 0 && temperature > 0);
+
+        if (oppositeTemperatures)
+        {
+            int tempDiff = Math.abs(this.temperature - temperature);
             this.temperature = temperature;
+            return tempDiff;
         }
+
+        this.temperature = temperature == 0 ? 0 : this.temperature + temperature;
         return 0;
     }
 

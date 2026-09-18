@@ -63,10 +63,12 @@ public class BuffEffect implements CardEffect
                 break;
 
             case TEMPERATURE:
-                int dmg = buffs.setTemperature(amount); 
-                if (dmg != 0) {
+                int temperatureDifference = buffs.setTemperature(amount);
+                if (temperatureDifference > 0)
+                {
                     int finalDmg = Buffs.calculateDamage(
-                        dmg, player.getBuffs(), enemy.getBuffs());
+                        temperatureDifference * 3,
+                        player.getBuffs(), enemy.getBuffs());
                     enemy.takeDamage(finalDmg);
                 }
                 break;
