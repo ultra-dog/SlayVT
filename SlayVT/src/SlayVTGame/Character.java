@@ -2,11 +2,12 @@ package SlayVTGame;
 
 public class Character
 {
-    private String name;
-    private int hp;
-    private int maxHp;
-    private int block;
-    private Buffs buffs;
+    protected String name;
+    protected int hp;
+    protected int maxHp;
+    protected int block;
+    protected Buffs buffs;
+    protected boolean ifAlive;
 
     public Character(String name, int maxHp)
     {
@@ -21,6 +22,7 @@ public class Character
         hp = maxHp;
         block = 0;
         buffs = new Buffs();
+        ifAlive = true;
     }
 
     // Damage modifiers are applied before calling this method.

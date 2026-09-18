@@ -11,7 +11,6 @@ public class Main
     private static FightSystem combat = new FightSystem();
     private static int floor = 0;
     private static final int TOTAL_FLOORS = 10;
-    private static Random random = new Random();
 
     public static void main(String[] args)
     {
@@ -91,7 +90,7 @@ public class Main
                     availableRooms.add("Shop");
                 }
 
-                Collections.shuffle(availableRooms, random);
+                Collections.shuffle(availableRooms, new Random());
 
                 ArrayList<String> options = new ArrayList<String>(
                     availableRooms.subList(

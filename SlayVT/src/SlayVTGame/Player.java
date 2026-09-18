@@ -2,13 +2,9 @@ package SlayVTGame;
 public class Player extends Character
 {
     //~ Fields ................................................................
-    private String name;
-    private int hp;
-    private int maxHp;
     private int energy;
     private int maxEnergy;
-    private int block;
-    private boolean ifAlive;
+    
     //~ Constructors ..........................................................
     public Player(String name, int maxHp) {
         super(name, maxHp);
