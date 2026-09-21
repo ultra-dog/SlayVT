@@ -39,6 +39,17 @@ public class Character
         hp = Math.max(0, hp - (damage - absorbed));
     }
 
+    public void takeUnblockableDamage(int damage)
+    {
+        if (damage < 0)
+        {
+            throw new IllegalArgumentException(
+                "Damage must not be negative.");
+        }
+
+        hp = Math.max(0, hp - damage);
+    }
+
     public boolean checkAlive()
     {
         return hp > 0;

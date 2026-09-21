@@ -8,6 +8,7 @@ public class Card
     private int cost;
     private String type;
     private CardEffect effect;
+    private boolean exhaust;
 
     public Card(CardLibrary cardType)
     {
@@ -15,6 +16,7 @@ public class Card
         cost = cardType.getCost();
         type = cardType.getType();
         effect = cardType.createEffect();
+        exhaust = cardType.isExhaust();
     }
 
     public String getName()
@@ -47,13 +49,35 @@ public class Card
         return effect.toString();
     }
 
+    public boolean isExhaust()
+    {
+        return exhaust;
+    }
+
     public boolean requiresEnemyTarget()
     {
         return effect.requiresEnemyTarget();
     }
 
+    public boolean targetsAllEnemies()
+    {
+        return effect.targetsAllEnemies();
+    }
+
     public void apply(Player player, Enemy enemy)
     {
+        ArrayList<Enemy> enemies = new ArrayList<Enemy>();
+        if (enemy != null)
+        {
+            enemies.add(enemy);
+        }
+        apply(new CombatContext(player, enemies, new CombatPiles()), enemy);
+    }
+
+    public void apply(CombatContext context, Enemy enemy)
+    {
+        Player player = context.getPlayer();
+
         if (requiresEnemyTarget()
             && (enemy == null || !enemy.checkAlive()))
         {
@@ -67,15 +91,24 @@ public class Card
         }
 
         player.spendEnergy(cost);
-        effect.apply(player, enemy);
+        effect.apply(context, enemy);
     }
 
     // Explicit multi-target application; self effects execute only once.
     public void apply(Player player, ArrayList<Enemy> enemies)
     {
+        CombatContext context = new CombatContext(
+            player, enemies, new CombatPiles());
+
+        if (targetsAllEnemies())
+        {
+            apply(context, (Enemy)null);
+            return;
+        }
+
         if (!requiresEnemyTarget())
         {
-            apply(player, (Enemy)null);
+            apply(context, (Enemy)null);
             return;
         }
 
@@ -116,7 +149,7 @@ public class Card
 
             if (enemy.checkAlive())
             {
-                effect.apply(player, enemy);
+                effect.apply(context, enemy);
             }
         }
     }

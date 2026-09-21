@@ -7,6 +7,10 @@ public class Buffs
     private int weakTurns;
     private int temperature;
 
+    private boolean redHotForm;
+    private boolean heatAppliedThisTurn;
+    private int temporaryHeatMultiplier = 1;
+
     private boolean vulnerableAtTurnStart;
     private boolean weakAtTurnStart;
 
@@ -45,6 +49,64 @@ public class Buffs
     public int getTemperature()
     {
         return temperature;
+    }
+
+    public void enableRedHotForm()
+    {
+        redHotForm = true;
+    }
+
+    public boolean hasRedHotForm()
+    {
+        return redHotForm;
+    }
+
+    public void markHeatAppliedThisTurn()
+    {
+        heatAppliedThisTurn = true;
+    }
+
+    public boolean wasHeatAppliedThisTurn()
+    {
+        return heatAppliedThisTurn;
+    }
+
+    public void multiplyHeatEndTurnDamage(int multiplier)
+    {
+        if (multiplier < 1)
+        {
+            throw new IllegalArgumentException(
+                "Heat multiplier must be positive.");
+        }
+
+        long combined = (long)temporaryHeatMultiplier * multiplier;
+        temporaryHeatMultiplier = combined > Integer.MAX_VALUE
+            ? Integer.MAX_VALUE : (int)combined;
+    }
+
+    public int getTemporaryHeatMultiplier()
+    {
+        return temporaryHeatMultiplier;
+    }
+
+    public int getHeatEndTurnDamage(int heat)
+    {
+        int safeHeat = Math.max(heat, 0);
+        int thresholdMultiplier = 1;
+
+        if (safeHeat >= 16)
+        {
+            thresholdMultiplier = redHotForm ? 4 : 3;
+        }
+        else if (safeHeat >= 8)
+        {
+            thresholdMultiplier = redHotForm ? 3 : 2;
+        }
+
+        long damage = (long)safeHeat * thresholdMultiplier
+            * temporaryHeatMultiplier;
+        return damage > Integer.MAX_VALUE
+            ? Integer.MAX_VALUE : (int)damage;
     }
 
     // Returns the temperature difference only for a hot/cold reversal.
@@ -119,6 +181,7 @@ public class Buffs
     {
         vulnerableAtTurnStart = isVulnerable();
         weakAtTurnStart = isWeak();
+        heatAppliedThisTurn = false;
     }
 
     // Only statuses present at the start of the owner's turn lose duration.
@@ -136,8 +199,8 @@ public class Buffs
 
         vulnerableAtTurnStart = false;
         weakAtTurnStart = false;
-
-        // Add end-of-turn temperature effects here later.
+        heatAppliedThisTurn = false;
+        temporaryHeatMultiplier = 1;
     }
 
     public void clear()
@@ -145,6 +208,9 @@ public class Buffs
         vulnerableTurns = 0;
         weakTurns = 0;
         temperature = 0;
+        redHotForm = false;
+        heatAppliedThisTurn = false;
+        temporaryHeatMultiplier = 1;
         vulnerableAtTurnStart = false;
         weakAtTurnStart = false;
     }
@@ -168,6 +234,16 @@ public class Buffs
         {
             description.add("Temperature: "
                 + (temperature > 0 ? "+" : "") + temperature);
+        }
+
+        if (redHotForm)
+        {
+            description.add("Red Hot Form");
+        }
+
+        if (temporaryHeatMultiplier > 1)
+        {
+            description.add("Heat damage x" + temporaryHeatMultiplier);
         }
 
         return description.length() == 0

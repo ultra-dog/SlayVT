@@ -5,16 +5,12 @@ import java.util.ArrayList;
 
 public class FightSystem
 {
-    private final ArrayList<Card> hand = new ArrayList<Card>();
-    private final ArrayList<Card> drawPile = new ArrayList<Card>();
-    private final ArrayList<Card> discardPile = new ArrayList<Card>();
+    private final CombatPiles piles = new CombatPiles();
 
     public boolean fight(
         Player player, ArrayList<Enemy> enemies, Deck deck)
     {
-        hand.clear();
-        drawPile.clear();
-        discardPile.clear();
+        piles.initialize(deck);
 
         player.getBuffs().clear();
         player.setBlock(0);
@@ -25,10 +21,7 @@ public class FightSystem
             enemy.setBlock(0);
         }
 
-        for (Card card : deck.getDeck())
-        {
-            drawPile.add(card);
-        }
+        CombatContext context = new CombatContext(player, enemies, piles);
 
         int turn = 1;
 
@@ -40,14 +33,15 @@ public class FightSystem
             player.setBlock(0);
             player.setEnergy(player.getMaxEnergy());
 
-            while (hand.size() < 5)
+            while (piles.getHand().size() < 5)
             {
-                if (drawPile.isEmpty() && discardPile.isEmpty())
+                if (piles.getDrawPile().isEmpty()
+                    && piles.getDiscardPile().isEmpty())
                 {
                     break;
                 }
 
-                drawCardFromPile(drawPile, hand, discardPile);
+                piles.drawToHand(1);
             }
 
             while (player.checkAlive() && hasLivingEnemies(enemies))
@@ -56,14 +50,17 @@ public class FightSystem
                 printEnemies(enemies);
                 println("");
 
-                int option = askOption(printOptions(hand), 0, hand.size());
+                int option = askOption(
+                    printOptions(piles.mutableHand()),
+                    0,
+                    piles.getHand().size());
 
                 if (option == 0)
                 {
                     break;
                 }
 
-                Card chosenCard = hand.get(option - 1);
+                Card chosenCard = piles.getHand().get(option - 1);
 
                 if (chosenCard.getCost() > player.getEnergy())
                 {
@@ -71,7 +68,11 @@ public class FightSystem
                     continue;
                 }
 
-                if (chosenCard.requiresEnemyTarget())
+                if (chosenCard.targetsAllEnemies())
+                {
+                    chosenCard.apply(context, (Enemy)null);
+                }
+                else if (chosenCard.requiresEnemyTarget())
                 {
                     ArrayList<Enemy> targets = new ArrayList<Enemy>();
 
@@ -91,26 +92,25 @@ public class FightSystem
                         continue;
                     }
 
-                    chosenCard.apply(player, targets.get(targetOption - 1));
+                    chosenCard.apply(
+                        context, targets.get(targetOption - 1));
                 }
                 else
                 {
-                    chosenCard.apply(player, (Enemy)null);
+                    chosenCard.apply(context, (Enemy)null);
                 }
 
-                discardPile.add(chosenCard);
-                hand.remove(option - 1);
+                piles.movePlayedCard(chosenCard);
             }
 
-            discardPile.addAll(hand);
-            hand.clear();
+            piles.discardHand();
 
             if (!player.checkAlive() || !hasLivingEnemies(enemies))
             {
                 break;
             }
 
-            player.getBuffs().endTurn();
+            context.resolvePlayerEndOfTurn();
 
             for (Enemy enemy : enemies)
             {
@@ -139,9 +139,7 @@ public class FightSystem
 
         boolean won = player.checkAlive() && !hasLivingEnemies(enemies);
 
-        hand.clear();
-        drawPile.clear();
-        discardPile.clear();
+        piles.clear();
 
         player.setBlock(0);
         player.getBuffs().clear();

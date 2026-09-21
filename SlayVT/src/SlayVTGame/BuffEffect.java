@@ -50,7 +50,8 @@ public class BuffEffect implements CardEffect
             throw new IllegalArgumentException("An enemy target is required.");
         }
 
-        Buffs buffs = targetEnemy ? enemy.getBuffs() : player.getBuffs();
+        Character target = targetEnemy ? enemy : player;
+        Buffs buffs = target.getBuffs();
 
         switch (type)
         {
@@ -63,14 +64,7 @@ public class BuffEffect implements CardEffect
                 break;
 
             case TEMPERATURE:
-                int temperatureDifference = buffs.setTemperature(amount);
-                if (temperatureDifference > 0)
-                {
-                    int finalDmg = Buffs.calculateDamage(
-                        temperatureDifference * 3,
-                        player.getBuffs(), enemy.getBuffs());
-                    enemy.takeDamage(finalDmg);
-                }
+                TemperatureEffect.apply(player, target, amount, true);
                 break;
         }
     }
