@@ -18,6 +18,7 @@ public class CardMechanicsTest
         testHiddenScorch();
         testFrozenHeart();
         testScatterIceAndExhaustPile();
+        testCardUpgrades();
 
         if (failures > 0)
         {
@@ -182,6 +183,116 @@ public class CardMechanicsTest
             piles.getDiscardPile().size());
         check("Normal card does not enter exhaust pile", 1,
             piles.getExhaustPile().size());
+    }
+
+    private static void testCardUpgrades()
+    {
+        RestSystem restSystem = new RestSystem();
+
+        Card strike = new Card(CardLibrary.STRIKE);
+        check("Rest Site upgrades Strike", true,
+            restSystem.upgradeCard(strike));
+        check("Upgraded Strike name", "Strike+", strike.getName());
+        Player strikePlayer = new Player("Player", 100);
+        Enemy strikeEnemy = new Enemy("Enemy", 100, 0);
+        strike.apply(strikePlayer, strikeEnemy);
+        check("Upgraded Strike deals 9 damage", 91, strikeEnemy.getHp());
+        check("A card cannot be upgraded twice", false, strike.upgrade());
+
+        Card defend = upgraded(CardLibrary.DEFEND);
+        Player defendPlayer = new Player("Player", 100);
+        defend.apply(defendPlayer, (Enemy)null);
+        check("Upgraded Defend gains 8 block", 8, defendPlayer.getBlock());
+
+        Card heatStrike = upgraded(CardLibrary.HEAT_STRIKE);
+        Player heatPlayer = new Player("Player", 100);
+        Enemy heatEnemy = new Enemy("Enemy", 100, 0);
+        heatStrike.apply(heatPlayer, heatEnemy);
+        check("Upgraded Heat Strike deals 10 damage", 90,
+            heatEnemy.getHp());
+        check("Upgraded Heat Strike applies 2 Heat", 2,
+            heatEnemy.getBuffs().getTemperature());
+
+        Card scorchPincer = upgraded(CardLibrary.SCORCH_PINCER);
+        Player scorchPlayer = new Player("Player", 100);
+        scorchPincer.apply(scorchPlayer, (Enemy)null);
+        check("Upgraded Scorch Pincer uses 3x multiplier", 3,
+            scorchPlayer.getBuffs().getTemporaryHeatMultiplier());
+
+        Card redHotForm = upgraded(CardLibrary.RED_HOT_FORM);
+        check("Upgraded Red Hot Form gains Retain", true,
+            redHotForm.isRetain());
+
+        Card overburn = upgraded(CardLibrary.OVERBURN);
+        Player overburnPlayer = new Player("Player", 100);
+        Enemy overburnEnemy = new Enemy("Enemy", 100, 0);
+        overburn.apply(overburnPlayer, overburnEnemy);
+        check("Upgraded Overburn applies 3 Heat when neutral", 3,
+            overburnEnemy.getBuffs().getTemperature());
+        overburn.apply(overburnPlayer, overburnEnemy);
+        check("Upgraded Overburn applies 5 Heat when hot", 8,
+            overburnEnemy.getBuffs().getTemperature());
+
+        Card hiddenScorch = upgraded(CardLibrary.HIDDEN_SCORCH);
+        Player hiddenPlayer = new Player("Player", 100);
+        Enemy first = new Enemy("First", 100, 0);
+        Enemy second = new Enemy("Second", 100, 0);
+        BattleContext hiddenContext = new BattleContext(
+            hiddenPlayer, enemies(first, second), new BattlePiles());
+        hiddenScorch.apply(hiddenContext, (Enemy)null);
+        check("Upgraded Hidden Scorch damages first enemy", 85,
+            first.getHp());
+        check("Upgraded Hidden Scorch damages second enemy", 85,
+            second.getHp());
+
+        Card frozenHeart = upgraded(CardLibrary.FROZEN_HEART);
+        Player frozenPlayer = new Player("Player", 100);
+        BattlePiles frozenPiles = new BattlePiles();
+        frozenPiles.initialize(new Deck(1));
+        BattleContext frozenContext = new BattleContext(
+            frozenPlayer, new ArrayList<Enemy>(), frozenPiles);
+        frozenHeart.apply(frozenContext, (Enemy)null);
+        check("Upgraded Frozen Heart grants 3 Energy", 6,
+            frozenPlayer.getEnergy());
+        check("Upgraded Frozen Heart still draws one card", 1,
+            frozenPiles.getHand().size());
+
+        Card scatterIce = upgraded(CardLibrary.SCATTER_ICE);
+        check("Upgraded Scatter Ice costs 1", 1, scatterIce.getCost());
+        check("Upgraded Scatter Ice remains Exhaust", true,
+            scatterIce.isExhaust());
+
+        Card voidFreeze = upgraded(CardLibrary.VOID_FREEZE);
+        Player voidPlayer = new Player("Player", 100);
+        Enemy voidEnemy = new Enemy("Enemy", 100, 0);
+        voidFreeze.apply(voidPlayer, voidEnemy);
+        check("Upgraded Void Freeze keeps 3 Cold", -3,
+            voidEnemy.getBuffs().getTemperature());
+        check("Upgraded Void Freeze applies 2 Weak", 2,
+            voidEnemy.getBuffs().getWeakTurns());
+
+        Card breeze = new Card(CardLibrary.BREEZE);
+        check("Breeze cannot be upgraded", false, breeze.canUpgrade());
+        check("Breeze rejects upgrade", false, breeze.upgrade());
+
+        BattlePiles retainPiles = new BattlePiles();
+        retainPiles.mutableHand().add(redHotForm);
+        retainPiles.mutableHand().add(new Card(CardLibrary.STRIKE));
+        retainPiles.discardHand();
+        check("Retained card remains in hand", 1,
+            retainPiles.getHand().size());
+        check("Only non-Retain card is discarded", 1,
+            retainPiles.getDiscardPile().size());
+    }
+
+    private static Card upgraded(CardLibrary cardType)
+    {
+        Card card = new Card(cardType);
+        if (!card.upgrade())
+        {
+            throw new AssertionError("Card should be upgradeable: " + cardType);
+        }
+        return card;
     }
 
     private static ArrayList<Enemy> enemies(Enemy... values)

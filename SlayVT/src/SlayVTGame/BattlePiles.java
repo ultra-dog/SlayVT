@@ -60,8 +60,15 @@ public class BattlePiles
 
     public void discardHand()
     {
-        discardPile.addAll(hand);
-        hand.clear();
+        for (int i = hand.size() - 1; i >= 0; i--)
+        {
+            Card card = hand.get(i);
+            if (!card.isRetain())
+            {
+                discardPile.add(card);
+                hand.remove(i);
+            }
+        }
     }
 
     public List<Card> getHand()

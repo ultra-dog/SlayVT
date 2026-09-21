@@ -9,6 +9,7 @@ public class Main
     private static Deck deck;
     private static ArrayList<Enemy> enemies = new ArrayList<Enemy>();
     private static BattleSystem battle = new BattleSystem();
+    private static RestSystem restSite = new RestSystem();
     private static int floor = 0;
     private static final int TOTAL_FLOORS = 15;
     private static final int CHEST_FLOORS = 9;
@@ -146,6 +147,7 @@ public class Main
 
                 case "RestSite":
                     println("You entered a Rest Site.");
+                    restSite.rest(player, deck);
                     break;
 
                 case "Shop":

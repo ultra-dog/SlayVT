@@ -2,6 +2,15 @@ package SlayVTGame;
 
 class HeatStrikeEffect implements CardEffect
 {
+    private final int damage;
+    private final int heat;
+
+    public HeatStrikeEffect(int damage, int heat)
+    {
+        this.damage = damage;
+        this.heat = heat;
+    }
+
     @Override
     public boolean requiresEnemyTarget()
     {
@@ -11,32 +20,40 @@ class HeatStrikeEffect implements CardEffect
     @Override
     public void apply(Player player, Enemy enemy)
     {
-        new DamageEffect(8).apply(player, enemy);
+        new DamageEffect(damage).apply(player, enemy);
         if (enemy.checkAlive())
         {
-            TemperatureEffect.apply(player, enemy, 1, true);
+            TemperatureEffect.apply(player, enemy, heat, true);
         }
     }
 
     @Override
     public String toString()
     {
-        return "Deal 8 damage. Apply 1 Heat.";
+        return "Deal " + damage + " damage. Apply " + heat + " Heat.";
     }
 }
 
 class ScorchPincerEffect implements CardEffect
 {
+    private final int multiplier;
+
+    public ScorchPincerEffect(int multiplier)
+    {
+        this.multiplier = multiplier;
+    }
+
     @Override
     public void apply(Player player, Enemy enemy)
     {
-        player.getBuffs().multiplyHeatEndTurnDamage(2);
+        player.getBuffs().multiplyHeatEndTurnDamage(multiplier);
     }
 
     @Override
     public String toString()
     {
-        return "Double Heat's end-of-turn damage this turn. Exhaust.";
+        return "Multiply Heat's end-of-turn damage by " + multiplier
+            + " this turn. Exhaust.";
     }
 }
 
@@ -59,6 +76,15 @@ class RedHotFormEffect implements CardEffect
 
 class OverburnEffect implements CardEffect
 {
+    private final int hotAmount;
+    private final int otherAmount;
+
+    public OverburnEffect(int hotAmount, int otherAmount)
+    {
+        this.hotAmount = hotAmount;
+        this.otherAmount = otherAmount;
+    }
+
     @Override
     public boolean requiresEnemyTarget()
     {
@@ -68,25 +94,34 @@ class OverburnEffect implements CardEffect
     @Override
     public void apply(Player player, Enemy enemy)
     {
-        int amount = enemy.getBuffs().getTemperature() > 0 ? 4 : 2;
+        int amount = enemy.getBuffs().getTemperature() > 0
+            ? hotAmount : otherAmount;
         TemperatureEffect.apply(player, enemy, amount, true);
     }
 
     @Override
     public String toString()
     {
-        return "If the enemy has Heat, apply 4 Heat. Otherwise, apply 2 Heat.";
+        return "If the enemy has Heat, apply " + hotAmount
+            + " Heat. Otherwise, apply " + otherAmount + " Heat.";
     }
 }
 
 class HiddenScorchEffect implements CardEffect
 {
+    private final int damage;
+
+    public HiddenScorchEffect(int damage)
+    {
+        this.damage = damage;
+    }
+
     @Override
     public void apply(Player player, Enemy enemy)
     {
         if (enemy != null)
         {
-            new DamageEffect(12).apply(player, enemy);
+            new DamageEffect(damage).apply(player, enemy);
         }
     }
 
@@ -98,7 +133,7 @@ class HiddenScorchEffect implements CardEffect
         {
             if (enemy.checkAlive())
             {
-                new DamageEffect(12).apply(player, enemy);
+                new DamageEffect(damage).apply(player, enemy);
             }
         }
 
@@ -117,18 +152,25 @@ class HiddenScorchEffect implements CardEffect
     @Override
     public String toString()
     {
-        return "Deal 12 damage to all enemies. If you applied Heat this "
-            + "turn, gain 2 Energy.";
+        return "Deal " + damage + " damage to all enemies. If you applied "
+            + "Heat this turn, gain 2 Energy.";
     }
 }
 
 class FrozenHeartEffect implements CardEffect
 {
+    private final int energy;
+
+    public FrozenHeartEffect(int energy)
+    {
+        this.energy = energy;
+    }
+
     @Override
     public void apply(Player player, Enemy enemy)
     {
         TemperatureEffect.apply(player, player, -2, false);
-        player.setEnergy(player.getEnergy() + 2);
+        player.setEnergy(player.getEnergy() + energy);
     }
 
     @Override
@@ -141,7 +183,8 @@ class FrozenHeartEffect implements CardEffect
     @Override
     public String toString()
     {
-        return "Apply 2 Cold to yourself. Gain 2 Energy. Draw 1 card.";
+        return "Apply 2 Cold to yourself. Gain " + energy
+            + " Energy. Draw 1 card.";
     }
 }
 
@@ -190,6 +233,15 @@ class ScatterIceEffect implements CardEffect
 
 class VoidFreezeEffect implements CardEffect
 {
+    private final int cold;
+    private final int weak;
+
+    public VoidFreezeEffect(int cold, int weak)
+    {
+        this.cold = cold;
+        this.weak = weak;
+    }
+
     @Override
     public boolean requiresEnemyTarget()
     {
@@ -199,16 +251,16 @@ class VoidFreezeEffect implements CardEffect
     @Override
     public void apply(Player player, Enemy enemy)
     {
-        TemperatureEffect.apply(player, enemy, -3, true);
+        TemperatureEffect.apply(player, enemy, -cold, true);
         if (enemy.checkAlive())
         {
-            enemy.getBuffs().addWeak(1);
+            enemy.getBuffs().addWeak(weak);
         }
     }
 
     @Override
     public String toString()
     {
-        return "Apply 3 Cold and 1 Weak.";
+        return "Apply " + cold + " Cold and " + weak + " Weak.";
     }
 }

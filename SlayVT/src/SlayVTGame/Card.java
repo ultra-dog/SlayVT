@@ -1,27 +1,33 @@
 package SlayVTGame;
 
 import java.util.ArrayList;
+import java.util.EnumSet;
 
 public class Card
 {
+    private final CardLibrary cardType;
     private String name;
     private int cost;
     private String type;
     private CardEffect effect;
-    private boolean exhaust;
+    private EnumSet<CardKeyword> keywords;
+    private boolean upgraded;
 
     public Card(CardLibrary cardType)
     {
-        name = cardType.getName();
-        cost = cardType.getCost();
-        type = cardType.getType();
-        effect = cardType.createEffect();
-        exhaust = cardType.isExhaust();
+        if (cardType == null)
+        {
+            throw new IllegalArgumentException("Card type must not be null.");
+        }
+
+        this.cardType = cardType;
+        upgraded = false;
+        rebuild();
     }
 
     public String getName()
     {
-        return name;
+        return upgraded ? name + "+" : name;
     }
 
     public int getCost()
@@ -51,7 +57,34 @@ public class Card
 
     public boolean isExhaust()
     {
-        return exhaust;
+        return keywords.contains(CardKeyword.EXHAUST);
+    }
+
+    public boolean isRetain()
+    {
+        return keywords.contains(CardKeyword.RETAIN);
+    }
+
+    public boolean isUpgraded()
+    {
+        return upgraded;
+    }
+
+    public boolean canUpgrade()
+    {
+        return !upgraded && cardType.canUpgrade();
+    }
+
+    public boolean upgrade()
+    {
+        if (!canUpgrade())
+        {
+            return false;
+        }
+
+        upgraded = true;
+        rebuild();
+        return true;
     }
 
     public boolean requiresEnemyTarget()
@@ -152,5 +185,14 @@ public class Card
                 effect.apply(context, enemy);
             }
         }
+    }
+
+    private void rebuild()
+    {
+        name = cardType.getName();
+        cost = cardType.getCost(upgraded);
+        type = cardType.getType();
+        effect = cardType.createEffect(upgraded);
+        keywords = cardType.createKeywords(upgraded);
     }
 }
