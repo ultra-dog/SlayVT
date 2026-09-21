@@ -4,7 +4,7 @@ public interface CardEffect
 {
     void apply(Player player, Enemy enemy);
 
-    default void apply(CombatContext context, Enemy enemy)
+    default void apply(BattleContext context, Enemy enemy)
     {
         apply(context.getPlayer(), enemy);
     }

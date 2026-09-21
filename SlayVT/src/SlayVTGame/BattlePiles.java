@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class CombatPiles
+public class BattlePiles
 {
     private final ArrayList<Card> hand = new ArrayList<Card>();
     private final ArrayList<Card> drawPile = new ArrayList<Card>();

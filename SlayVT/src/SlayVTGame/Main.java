@@ -8,9 +8,10 @@ public class Main
     private static Player player;
     private static Deck deck;
     private static ArrayList<Enemy> enemies = new ArrayList<Enemy>();
-    private static FightSystem combat = new FightSystem();
+    private static BattleSystem battle = new BattleSystem();
     private static int floor = 0;
-    private static final int TOTAL_FLOORS = 10;
+    private static final int TOTAL_FLOORS = 15;
+    private static final int CHEST_FLOORS = 9;
 
     public static void main(String[] args)
     {
@@ -18,7 +19,8 @@ public class Main
 
         int characterNum = askOption(
             "Please enter a number to choose your character: 1: Warrior",
-            1, 1);
+            1,
+            1);
 
         switch (characterNum)
         {
@@ -32,8 +34,9 @@ public class Main
 
         deck = new Deck(1);
 
-        boolean campfirePreviouslyOffered = false;
-        boolean shopPreviouslyOffered = false;
+        boolean restSiteOffered = false;
+        boolean shopOffered = false;
+        boolean eliteOffered = false;
 
         for (floor = 1; floor <= TOTAL_FLOORS; floor++)
         {
@@ -41,13 +44,10 @@ public class Main
 
             if (floor == TOTAL_FLOORS)
             {
-                askOption("Choose your next room:\n1: Boss", 1, 1);
-                println("Boss Room");
-
                 enemies.clear();
                 enemies.add(new Enemy("Boss", 48, 10));
 
-                if (combat.fight(player, enemies, deck))
+                if (battle.fight(player, enemies, deck))
                 {
                     println("Victory!");
                 }
@@ -58,57 +58,56 @@ public class Main
 
                 return;
             }
-
             String selectedRoom;
-
-            if (floor == 1)
-            {
-                selectedRoom = "Monster";
-                campfirePreviouslyOffered = false;
-                shopPreviouslyOffered = false;
+            ArrayList<String> options = new ArrayList<String>();
+            switch (floor) {
+                case 1:
+                    options.add("Monster");
+                    break;
+                case TOTAL_FLOORS - 1:
+                    options.add("RestSite");
+                    break;
+                case TOTAL_FLOORS:
+                    options.add("Boss");
+                    break;
+                case CHEST_FLOORS:
+                    options.add("Chest");
+                    break;
+                default:
+                    ArrayList<String> availableRooms = new ArrayList<String>();
+                    availableRooms.add("Monster");
+                    availableRooms.add("Event");
+                    if (!restSiteOffered && floor != TOTAL_FLOORS - 2)
+                    {
+                        availableRooms.add("RestSite");
+                    }
+                    if (!shopOffered)
+                    {
+                        availableRooms.add("Shop");
+                    }
+                    if (!eliteOffered) {
+                        availableRooms.add("Elite");
+                    }
+                    Collections.shuffle(availableRooms, new Random());
+                    options = new ArrayList<String>(
+                        availableRooms.subList(
+                            0,
+                            randomInt(1, Math.min(2, availableRooms.size()))));
             }
-            else if (floor == TOTAL_FLOORS - 1)
+
+            String prompt = "Choose your next room:";
+
+            for (int i = 0; i < options.size(); i++)
             {
-                selectedRoom = "Campfire";
-                campfirePreviouslyOffered = true;
-                shopPreviouslyOffered = false;
+                prompt += "\n" + (i + 1) + ": " + options.get(i);
             }
-            else
-            {
-                ArrayList<String> availableRooms = new ArrayList<String>();
-                availableRooms.add("Monster");
-                availableRooms.add("Event");
 
-                if (!campfirePreviouslyOffered
-                    && floor != TOTAL_FLOORS - 2)
-                {
-                    availableRooms.add("Campfire");
-                }
+            int choice = askOption(prompt, 1, options.size());
+            selectedRoom = options.get(choice - 1);
 
-                if (!shopPreviouslyOffered)
-                {
-                    availableRooms.add("Shop");
-                }
-
-                Collections.shuffle(availableRooms, new Random());
-
-                ArrayList<String> options = new ArrayList<String>(
-                    availableRooms.subList(
-                        0, randomInt(1, Math.min(3, availableRooms.size()))));
-
-                String prompt = "Choose your next room:";
-
-                for (int i = 0; i < options.size(); i++)
-                {
-                    prompt += "\n" + (i + 1) + ": " + options.get(i);
-                }
-
-                int choice = askOption(prompt, 1, options.size());
-                selectedRoom = options.get(choice - 1);
-
-                campfirePreviouslyOffered = options.contains("Campfire");
-                shopPreviouslyOffered = options.contains("Shop");
-            }
+            restSiteOffered = options.contains("RestSite");
+            shopOffered = options.contains("Shop");
+            eliteOffered = options.contains("Elite");
 
             switch (selectedRoom)
             {
@@ -116,7 +115,21 @@ public class Main
                     enemies.clear();
                     enemies.add(new Enemy("Enemy 1", 12, 10));
 
-                    if (combat.fight(player, enemies, deck))
+                    if (battle.fight(player, enemies, deck))
+                    {
+                        println("Win");
+                    }
+                    else
+                    {
+                        println("Lose");
+                        return;
+                    }
+                    break;
+                case "Elite":
+                    enemies.clear();
+                    enemies.add(new Enemy("Elite", 30, 10));
+
+                    if (battle.fight(player, enemies, deck))
                     {
                         println("Win");
                     }
@@ -131,12 +144,15 @@ public class Main
                     println("You entered an Event Room.");
                     break;
 
-                case "Campfire":
-                    println("You entered a Campfire Room.");
+                case "RestSite":
+                    println("You entered a Rest Site.");
                     break;
 
                 case "Shop":
                     println("You entered a Shop Room.");
+                    break;
+                default:
+                    println("Content not updated.");
                     break;
             }
         }

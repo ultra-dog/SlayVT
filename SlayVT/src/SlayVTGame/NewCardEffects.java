@@ -91,7 +91,7 @@ class HiddenScorchEffect implements CardEffect
     }
 
     @Override
-    public void apply(CombatContext context, Enemy ignored)
+    public void apply(BattleContext context, Enemy ignored)
     {
         Player player = context.getPlayer();
         for (Enemy enemy : context.getEnemies())
@@ -132,7 +132,7 @@ class FrozenHeartEffect implements CardEffect
     }
 
     @Override
-    public void apply(CombatContext context, Enemy enemy)
+    public void apply(BattleContext context, Enemy enemy)
     {
         apply(context.getPlayer(), enemy);
         context.drawCards(1);
@@ -160,7 +160,7 @@ class ScatterIceEffect implements CardEffect
     }
 
     @Override
-    public void apply(CombatContext context, Enemy target)
+    public void apply(BattleContext context, Enemy target)
     {
         int cold = Math.max(-target.getBuffs().getTemperature(), 0);
         int spreadAmount = cold / 2;

@@ -49,6 +49,16 @@ public class Character
 
         hp = Math.max(0, hp - damage);
     }
+    
+    public void heal(int healamount)
+    {
+        if (healamount < 0)
+        {
+            throw new IllegalArgumentException("Heal must not be negative.");
+        }
+
+        hp = Math.min(maxHp, hp + healamount);
+    }
 
     public boolean checkAlive()
     {

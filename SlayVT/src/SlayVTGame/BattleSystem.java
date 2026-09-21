@@ -3,9 +3,9 @@ package SlayVTGame;
 import static SlayVTGame.ToolClass.*;
 import java.util.ArrayList;
 
-public class FightSystem
+public class BattleSystem
 {
-    private final CombatPiles piles = new CombatPiles();
+    private final BattlePiles piles = new BattlePiles();
 
     public boolean fight(
         Player player, ArrayList<Enemy> enemies, Deck deck)
@@ -21,7 +21,7 @@ public class FightSystem
             enemy.setBlock(0);
         }
 
-        CombatContext context = new CombatContext(player, enemies, piles);
+        BattleContext context = new BattleContext(player, enemies, piles);
 
         int turn = 1;
 
@@ -86,7 +86,6 @@ public class FightSystem
 
                     int targetOption = askOption(
                         printEnemyOption(targets), 0, targets.size());
-
                     if (targetOption == 0)
                     {
                         continue;

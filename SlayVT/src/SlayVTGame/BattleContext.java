@@ -4,14 +4,14 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class CombatContext
+public class BattleContext
 {
     private final Player player;
     private final ArrayList<Enemy> enemies;
-    private final CombatPiles piles;
+    private final BattlePiles piles;
 
-    public CombatContext(
-        Player player, ArrayList<Enemy> enemies, CombatPiles piles)
+    public BattleContext(
+        Player player, ArrayList<Enemy> enemies, BattlePiles piles)
     {
         if (player == null || enemies == null || piles == null)
         {
@@ -34,7 +34,7 @@ public class CombatContext
         return Collections.unmodifiableList(enemies);
     }
 
-    public CombatPiles getPiles()
+    public BattlePiles getPiles()
     {
         return piles;
     }

@@ -10,7 +10,7 @@ public final class TemperatureEffect
         Player player,
         Character target,
         int amount,
-        boolean convertCoolingWithRedHotForm)
+        boolean convertCooling)
     {
         if (player == null || target == null)
         {
@@ -19,7 +19,7 @@ public final class TemperatureEffect
         }
 
         int effectiveAmount = amount;
-        if (convertCoolingWithRedHotForm
+        if (convertCooling
             && player.getBuffs().hasRedHotForm()
             && amount < 0)
         {

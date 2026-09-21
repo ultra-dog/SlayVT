@@ -71,10 +71,10 @@ public class Card
         {
             enemies.add(enemy);
         }
-        apply(new CombatContext(player, enemies, new CombatPiles()), enemy);
+        apply(new BattleContext(player, enemies, new BattlePiles()), enemy);
     }
 
-    public void apply(CombatContext context, Enemy enemy)
+    public void apply(BattleContext context, Enemy enemy)
     {
         Player player = context.getPlayer();
 
@@ -97,8 +97,8 @@ public class Card
     // Explicit multi-target application; self effects execute only once.
     public void apply(Player player, ArrayList<Enemy> enemies)
     {
-        CombatContext context = new CombatContext(
-            player, enemies, new CombatPiles());
+        BattleContext context = new BattleContext(
+            player, enemies, new BattlePiles());
 
         if (targetsAllEnemies())
         {

@@ -1,5 +1,6 @@
 package SlayVTGame;
 import static SlayVTGame.ToolClass.*;
+
 import java.util.*;
 
 public final class ToolClass

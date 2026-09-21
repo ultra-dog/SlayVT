@@ -96,8 +96,8 @@ public class CardMechanicsTest
         Player player = new Player("Player", 100);
         Enemy enemy = new Enemy("Enemy", 100, 0);
         ArrayList<Enemy> enemies = enemies(enemy);
-        CombatContext context = new CombatContext(
-            player, enemies, new CombatPiles());
+        BattleContext context = new BattleContext(
+            player, enemies, new BattlePiles());
 
         player.getBuffs().enableRedHotForm();
         enemy.getBuffs().setTemperature(8);
@@ -121,8 +121,8 @@ public class CardMechanicsTest
         Enemy first = new Enemy("First", 100, 0);
         Enemy second = new Enemy("Second", 100, 0);
         ArrayList<Enemy> enemies = enemies(first, second);
-        CombatContext context = new CombatContext(
-            player, enemies, new CombatPiles());
+        BattleContext context = new BattleContext(
+            player, enemies, new BattlePiles());
 
         TemperatureEffect.apply(player, first, 1, true);
         int energyBefore = player.getEnergy();
@@ -138,9 +138,9 @@ public class CardMechanicsTest
     {
         Player player = new Player("Player", 100);
         ArrayList<Enemy> enemies = new ArrayList<Enemy>();
-        CombatPiles piles = new CombatPiles();
+        BattlePiles piles = new BattlePiles();
         piles.initialize(new Deck(1));
-        CombatContext context = new CombatContext(player, enemies, piles);
+        BattleContext context = new BattleContext(player, enemies, piles);
 
         player.getBuffs().enableRedHotForm();
         new Card(CardLibrary.FROZEN_HEART).apply(context, (Enemy)null);
@@ -159,8 +159,8 @@ public class CardMechanicsTest
         Enemy target = new Enemy("Target", 100, 0);
         Enemy other = new Enemy("Other", 100, 0);
         ArrayList<Enemy> enemies = enemies(target, other);
-        CombatPiles piles = new CombatPiles();
-        CombatContext context = new CombatContext(player, enemies, piles);
+        BattlePiles piles = new BattlePiles();
+        BattleContext context = new BattleContext(player, enemies, piles);
         Card scatterIce = new Card(CardLibrary.SCATTER_ICE);
 
         target.getBuffs().setTemperature(-5);
