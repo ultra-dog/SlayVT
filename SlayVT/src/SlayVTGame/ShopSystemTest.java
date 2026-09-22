@@ -21,6 +21,7 @@ public class ShopSystemTest
         testDeckRemoval();
         testShopItemValidation();
         testSeededInventory();
+        testCardPurchases();
 
         if (failures > 0)
         {
@@ -28,6 +29,65 @@ public class ShopSystemTest
                 + " shop checks failed.");
         }
         System.out.println("PASS: " + checks + " shop checks.");
+    }
+
+    private static void testCardPurchases()
+    {
+        ShopSystem shop = new ShopSystem(new Random(1));
+        ArrayList<ShopItem> inventory = shop.beginVisit();
+        ShopItem item = inventory.get(0);
+        Player player = new Player("Player", 80);
+        Deck deck = new Deck(1);
+        int initialSize = deck.size();
+
+        check("Affordable card purchase succeeds", true,
+            shop.purchaseCard(player, deck, item));
+        check("Purchase deducts exact price", 99 - item.getPrice(),
+            player.getGold());
+        check("Purchase adds one card", initialSize + 1, deck.size());
+        check("Purchased offer is sold", true, item.isSold());
+        check("Sold offer cannot be purchased twice", false,
+            shop.purchaseCard(player, deck, item));
+        check("Second purchase does not charge Gold", 99 - item.getPrice(),
+            player.getGold());
+        check("Second purchase does not add a card", initialSize + 1,
+            deck.size());
+
+        Player poorPlayer = new Player("Poor", 80);
+        poorPlayer.spendGold(99);
+        Deck poorDeck = new Deck(1);
+        ShopItem expensive = new ShopItem(CardLibrary.RED_HOT_FORM, 75);
+        int poorSize = poorDeck.size();
+        check("Unaffordable purchase fails", false,
+            shop.purchaseCard(poorPlayer, poorDeck, expensive));
+        check("Unaffordable purchase preserves Gold", 0,
+            poorPlayer.getGold());
+        check("Unaffordable purchase preserves deck", poorSize,
+            poorDeck.size());
+        check("Unaffordable offer remains available", false,
+            expensive.isSold());
+
+        checkThrows("Null purchase player is rejected", new TestAction()
+        {
+            public void run()
+            {
+                shop.purchaseCard(null, deck, item);
+            }
+        });
+        checkThrows("Null purchase deck is rejected", new TestAction()
+        {
+            public void run()
+            {
+                shop.purchaseCard(player, null, item);
+            }
+        });
+        checkThrows("Null purchase item is rejected", new TestAction()
+        {
+            public void run()
+            {
+                shop.purchaseCard(player, deck, null);
+            }
+        });
     }
 
     private static void testShopItemValidation()

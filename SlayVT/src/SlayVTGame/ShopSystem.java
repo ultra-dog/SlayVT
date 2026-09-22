@@ -45,6 +45,22 @@ public class ShopSystem
         return inventory;
     }
 
+    public boolean purchaseCard(Player player, Deck deck, ShopItem item)
+    {
+        if (player == null || deck == null || item == null)
+        {
+            throw new IllegalArgumentException(
+                "Player, deck, and shop item must not be null.");
+        }
+        if (item.isSold() || !player.spendGold(item.getPrice()))
+        {
+            return false;
+        }
+        deck.addCard(item.getCardType());
+        item.markSold();
+        return true;
+    }
+
     private ArrayList<CardLibrary> cardsOfType(String type)
     {
         ArrayList<CardLibrary> cards = new ArrayList<CardLibrary>();
