@@ -74,9 +74,11 @@ public enum CardLibrary
             case DEFEND:
                 return new BlockEffect(upgraded ? 8 : 5);
             case BREEZE:
-                return new BuffEffect(BuffType.TEMPERATURE, -2);
+                return new BuffEffect(BuffType.TEMPERATURE,
+                    upgraded ? -3 : -2);
             case BURN:
-                return new BuffEffect(BuffType.TEMPERATURE, 2);
+                return new BuffEffect(BuffType.TEMPERATURE,
+                    upgraded ? 3 : 2);
             case HEAT_STRIKE:
                 return new HeatStrikeEffect(
                     upgraded ? 10 : 8,

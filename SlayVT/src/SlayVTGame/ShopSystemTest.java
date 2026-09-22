@@ -25,6 +25,7 @@ public class ShopSystemTest
         testDeckRemoval();
         testShopItemValidation();
         testSeededInventory();
+        testStarterCardsAreNotForSale();
         testCardPurchases();
         testCardRemovalService();
         testOpenCanLeave();
@@ -271,6 +272,21 @@ public class ShopSystemTest
         check("Inventory has two Skills", 2, skills);
         check("Inventory has one Power", 1, powers);
         check("Inventory contains no duplicates", 5, unique.size());
+    }
+
+    private static void testStarterCardsAreNotForSale()
+    {
+        ShopSystem shop = new ShopSystem(new Random(1));
+        for (int visit = 0; visit < 100; visit++)
+        {
+            for (ShopItem item : shop.beginVisit())
+            {
+                check("Strike is not for sale", false,
+                    item.getCardType() == CardLibrary.STRIKE);
+                check("Defend is not for sale", false,
+                    item.getCardType() == CardLibrary.DEFEND);
+            }
+        }
     }
 
     private static String inventorySignature(ArrayList<ShopItem> items)

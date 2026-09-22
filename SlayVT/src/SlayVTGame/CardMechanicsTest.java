@@ -271,9 +271,21 @@ public class CardMechanicsTest
         check("Upgraded Void Freeze applies 2 Weak", 2,
             voidEnemy.getBuffs().getWeakTurns());
 
-        Card breeze = new Card(CardLibrary.BREEZE);
-        check("Breeze cannot be upgraded", false, breeze.canUpgrade());
-        check("Breeze rejects upgrade", false, breeze.upgrade());
+        Card breeze = upgraded(CardLibrary.BREEZE);
+        Player breezePlayer = new Player("Player", 100);
+        Enemy breezeEnemy = new Enemy("Enemy", 100, 0);
+        breeze.apply(breezePlayer, breezeEnemy);
+        check("Upgraded Breeze applies 3 Cold", -3,
+            breezeEnemy.getBuffs().getTemperature());
+        check("Upgraded Breeze cannot upgrade twice", false,
+            breeze.canUpgrade());
+
+        Card burn = upgraded(CardLibrary.BURN);
+        Player burnPlayer = new Player("Player", 100);
+        Enemy burnEnemy = new Enemy("Enemy", 100, 0);
+        burn.apply(burnPlayer, burnEnemy);
+        check("Upgraded Burn applies 3 Heat", 3,
+            burnEnemy.getBuffs().getTemperature());
 
         BattlePiles retainPiles = new BattlePiles();
         retainPiles.mutableHand().add(redHotForm);

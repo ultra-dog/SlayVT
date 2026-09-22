@@ -196,7 +196,9 @@ public class ShopSystem
         ArrayList<CardLibrary> cards = new ArrayList<CardLibrary>();
         for (CardLibrary cardType : CardLibrary.values())
         {
-            if (type.equals(cardType.getType()))
+            if (type.equals(cardType.getType())
+                && cardType != CardLibrary.STRIKE
+                && cardType != CardLibrary.DEFEND)
             {
                 cards.add(cardType);
             }
