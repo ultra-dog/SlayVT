@@ -1,5 +1,10 @@
 package SlayVTGame;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Random;
+import java.util.Set;
+
 public class ShopSystemTest
 {
     private interface TestAction
@@ -14,6 +19,8 @@ public class ShopSystemTest
     {
         testPlayerGold();
         testDeckRemoval();
+        testShopItemValidation();
+        testSeededInventory();
 
         if (failures > 0)
         {
@@ -21,6 +28,80 @@ public class ShopSystemTest
                 + " shop checks failed.");
         }
         System.out.println("PASS: " + checks + " shop checks.");
+    }
+
+    private static void testShopItemValidation()
+    {
+        ShopItem item = new ShopItem(CardLibrary.STRIKE, 50);
+        check("Item exposes its card type", "Strike",
+            item.getCardType().getName());
+        check("Item exposes its price", 50, item.getPrice());
+        check("New item is available", false, item.isSold());
+        checkThrows("Null item type is rejected", new TestAction()
+        {
+            public void run()
+            {
+                new ShopItem(null, 50);
+            }
+        });
+        checkThrows("Non-positive item price is rejected", new TestAction()
+        {
+            public void run()
+            {
+                new ShopItem(CardLibrary.STRIKE, 0);
+            }
+        });
+    }
+
+    private static void testSeededInventory()
+    {
+        ArrayList<ShopItem> first =
+            new ShopSystem(new Random(2114)).beginVisit();
+        ArrayList<ShopItem> second =
+            new ShopSystem(new Random(2114)).beginVisit();
+        check("Shop offers five cards", 5, first.size());
+        check("Seeded inventory is repeatable", inventorySignature(first),
+            inventorySignature(second));
+
+        int attacks = 0;
+        int skills = 0;
+        int powers = 0;
+        Set<CardLibrary> unique = new HashSet<CardLibrary>();
+        for (ShopItem item : first)
+        {
+            unique.add(item.getCardType());
+            String type = item.getCardType().getType();
+            if ("Attack".equals(type))
+            {
+                attacks++;
+                check("Attack costs 50", 50, item.getPrice());
+            }
+            else if ("Skill".equals(type))
+            {
+                skills++;
+                check("Skill costs 50", 50, item.getPrice());
+            }
+            else if ("Power".equals(type))
+            {
+                powers++;
+                check("Power costs 75", 75, item.getPrice());
+            }
+        }
+        check("Inventory has two Attacks", 2, attacks);
+        check("Inventory has two Skills", 2, skills);
+        check("Inventory has one Power", 1, powers);
+        check("Inventory contains no duplicates", 5, unique.size());
+    }
+
+    private static String inventorySignature(ArrayList<ShopItem> items)
+    {
+        String signature = "";
+        for (ShopItem item : items)
+        {
+            signature += item.getCardType().name() + ":"
+                + item.getPrice() + ";";
+        }
+        return signature;
     }
 
     private static void testDeckRemoval()
