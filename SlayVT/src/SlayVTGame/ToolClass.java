@@ -5,6 +5,40 @@ import java.util.*;
 
 public final class ToolClass
 {
+    public static String title(String text)
+    {
+        return "\n========================================\n"
+            + text.toUpperCase(Locale.ROOT)
+            + "\n========================================";
+    }
+
+    public static String choiceLine(int number, String text)
+    {
+        return "  " + number + ": " + text;
+    }
+
+    public static String detailLine(String text)
+    {
+        StringBuilder result = new StringBuilder("     ");
+        int lineLength = 5;
+        for (String word : text.split("\\s+"))
+        {
+            if (lineLength > 5 && lineLength + word.length() + 1 > 72)
+            {
+                result.append("\n     ");
+                lineLength = 5;
+            }
+            else if (lineLength > 5)
+            {
+                result.append(' ');
+                lineLength++;
+            }
+            result.append(word);
+            lineLength += word.length();
+        }
+        return result.toString();
+    }
+
     public static void print(String txt)
     {
         System.out.print(txt);
@@ -56,35 +90,32 @@ public final class ToolClass
 
     public static void printPlayer(Player player)
     {
-        print(
-            player.getName() + " HP: " + player.getHp() + "/"
-                + player.getMaxHp());
-        if (player.getBlock() > 0)
+        println("\nYOU: " + player.getName());
+        println("  HP: " + player.getHp() + "/" + player.getMaxHp()
+            + "  |  Block: " + player.getBlock()
+            + "  |  Energy: " + player.getEnergy() + "/"
+            + player.getMaxEnergy() + "  |  Gold: " + player.getGold());
+        String statuses = player.getBuffs().toString();
+        if (player.checkAlive() && !"None".equals(statuses))
         {
-            print(" Block: " + player.getBlock());
-        }
-        println(
-            " Energy: (" + player.getEnergy() + "/" + player.getMaxEnergy()
-                + ")");
-        if (player.checkAlive() && player.getBuffs().toString() != "None")
-        {
-            println("Your statuses: " + player.getBuffs());
+            println("  Status: " + statuses);
         }
     }
 
 
     public static void printEnemies(ArrayList<Enemy> enemies)
     {
+        println("\nENEMIES");
         for (int i = 0; i < enemies.size(); i++)
         {
             Enemy temp = enemies.get(i);
-            println(
-                temp.getName() + " HP: " + temp.getHp() + "/" + temp.getMaxHp()
-                    + " intends to Hit " + temp.getDmg());
-            if (temp.checkAlive() && temp.getBuffs().toString() != "None")
+            println(choiceLine(i + 1, temp.getName()
+                + "  |  HP: " + temp.getHp() + "/" + temp.getMaxHp()
+                + "  |  Intent: " + temp.getDmg() + " damage"));
+            String statuses = temp.getBuffs().toString();
+            if (temp.checkAlive() && !"None".equals(statuses))
             {
-                println(temp.getName() + " statuses: "
-                    + temp.getBuffs());
+                println("     Status: " + statuses);
             }
         }
     }
@@ -92,31 +123,30 @@ public final class ToolClass
 
     public static String printOptions(ArrayList<Card> hand)
     {
-        String txt = "";
-        txt += "Please enter number to play your card:\n";
+        String txt = "\nYOUR HAND (" + hand.size() + ")\n";
         for (int i = 0; i < hand.size(); i++)
         {
             Card temp = hand.get(i);
-            txt += (i + 1) + ": " + temp.getName() + " (Cost "
-                    + temp.getCost() + ") " + temp.getEffect() + "\n";
+            txt += choiceLine(i + 1, temp.getName() + " ["
+                + temp.getCost() + " Energy]") + "\n"
+                + detailLine(temp.getEffect()) + "\n";
         }
-        txt += "0: End your turn.";
+        txt += "\n" + choiceLine(0, "End turn");
         return txt;
     }
 
 
     public static String printEnemyOption(ArrayList<Enemy> enemies)
     {
-        String txt = "";
-        txt += "Please enter number to choose your target:\n";
+        String txt = "\nCHOOSE TARGET\n";
         for (int i = 0; i < enemies.size(); i++)
         {
             Enemy temp = enemies.get(i);
-            txt += 
-                "" + (i + 1) + ": " + temp.getName() + " intends to attack "
-                    + temp.getDmg() + "\n";
+            txt += choiceLine(i + 1, temp.getName() + "  |  HP: "
+                + temp.getHp() + "/" + temp.getMaxHp()
+                + "  |  Intent: " + temp.getDmg() + " damage") + "\n";
         }
-        txt += "0: Cancel.";
+        txt += "\n" + choiceLine(0, "Cancel");
         return txt;
     }
 
@@ -126,7 +156,7 @@ public final class ToolClass
         String name = "";
         while (true)
         {
-            println("Please enter your name: ");
+            println(title("SLAY VT") + "\nEnter your name:");
             try
             {
                 name = new Scanner(System.in).nextLine();
@@ -163,6 +193,7 @@ public final class ToolClass
         while (true)
         {
             println(prompt);
+            print("\n> ");
             try
             {
                 option = new Scanner(System.in).nextInt();

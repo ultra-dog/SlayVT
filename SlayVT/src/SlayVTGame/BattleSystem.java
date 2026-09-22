@@ -27,7 +27,7 @@ public class BattleSystem
 
         while (player.checkAlive() && hasLivingEnemies(enemies))
         {
-            println("Turn " + turn);
+            println(title("TURN " + turn));
 
             player.getBuffs().startTurn();
             player.setBlock(0);
@@ -48,7 +48,6 @@ public class BattleSystem
             {
                 printPlayer(player);
                 printEnemies(enemies);
-                println("");
 
                 int option = askOption(
                     printOptions(piles.mutableHand()),
@@ -64,7 +63,8 @@ public class BattleSystem
 
                 if (chosenCard.getCost() > player.getEnergy())
                 {
-                    println("You don't have enough Energy.");
+                    println("\nNot enough Energy for "
+                        + chosenCard.getName() + ".");
                     continue;
                 }
 
@@ -111,6 +111,8 @@ public class BattleSystem
 
             context.resolvePlayerEndOfTurn();
 
+            println("\nENEMY TURN");
+
             for (Enemy enemy : enemies)
             {
                 if (!player.checkAlive())
@@ -129,6 +131,8 @@ public class BattleSystem
                 int damage = Buffs.calculateDamage(
                     enemy.getDmg(), enemy.getBuffs(), player.getBuffs());
 
+                println("  " + enemy.getName() + " attacks for "
+                    + damage + " damage.");
                 player.takeDamage(damage);
                 enemy.getBuffs().endTurn();
             }

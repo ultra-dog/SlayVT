@@ -20,7 +20,8 @@ public class Main
         String name = askName();
 
         int characterNum = askOption(
-            "Please enter a number to choose your character: 1: Warrior",
+            title("CHOOSE YOUR CHARACTER") + "\n"
+                + choiceLine(1, "Warrior"),
             1,
             1);
 
@@ -42,7 +43,9 @@ public class Main
 
         for (floor = 1; floor <= TOTAL_FLOORS; floor++)
         {
-            println("\nFloor " + floor);
+            println(title("FLOOR " + floor + " / " + TOTAL_FLOORS));
+            println("HP: " + player.getHp() + "/" + player.getMaxHp()
+                + "  |  Gold: " + player.getGold());
 
             if (floor == TOTAL_FLOORS)
             {
@@ -51,11 +54,11 @@ public class Main
 
                 if (battle.fight(player, enemies, deck))
                 {
-                    println("Victory!");
+                    println(title("VICTORY"));
                 }
                 else
                 {
-                    println("You died.");
+                    println(title("GAME OVER"));
                 }
 
                 return;
@@ -97,11 +100,11 @@ public class Main
                             randomInt(1, Math.min(2, availableRooms.size()))));
             }
 
-            String prompt = "Choose your next room:";
+            String prompt = "\nCHOOSE YOUR NEXT ROOM\n";
 
             for (int i = 0; i < options.size(); i++)
             {
-                prompt += "\n" + (i + 1) + ": " + options.get(i);
+                prompt += "\n" + choiceLine(i + 1, options.get(i));
             }
 
             int choice = askOption(prompt, 1, options.size());
@@ -119,11 +122,11 @@ public class Main
 
                     if (battle.fight(player, enemies, deck))
                     {
-                        println("Win");
+                        println("\nBattle won.");
                     }
                     else
                     {
-                        println("Lose");
+                        println(title("GAME OVER"));
                         return;
                     }
                     break;
@@ -133,17 +136,18 @@ public class Main
 
                     if (battle.fight(player, enemies, deck))
                     {
-                        println("Win");
+                        println("\nBattle won.");
                     }
                     else
                     {
-                        println("Lose");
+                        println(title("GAME OVER"));
                         return;
                     }
                     break;
 
                 case "Event":
-                    println("You entered an Event Room.");
+                    println(title("EVENT")
+                        + "\nNo event is available yet.");
                     break;
 
                 case "RestSite":
@@ -154,7 +158,8 @@ public class Main
                     shop.open(player, deck);
                     break;
                 default:
-                    println("Content not updated.");
+                    println(title(selectedRoom)
+                        + "\nContent not updated.");
                     break;
             }
         }

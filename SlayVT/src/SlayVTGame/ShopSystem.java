@@ -78,26 +78,29 @@ public class ShopSystem
         int removeOption = inventory.size() + 1;
         while (true)
         {
-            String prompt = "Gold: " + player.getGold() + "\nShop:";
+            String prompt = title("SHOP") + "\nGold: "
+                + player.getGold() + "\n\nCARDS";
             for (int i = 0; i < inventory.size(); i++)
             {
                 ShopItem item = inventory.get(i);
                 Card card = new Card(item.getCardType());
-                prompt += "\n" + (i + 1) + ": " + card.getName()
-                    + " (" + item.getPrice() + " Gold) "
-                    + card.getEffect();
+                String label = card.getName() + " ("
+                    + item.getPrice() + " Gold)";
                 if (item.isSold())
                 {
-                    prompt += " [SOLD]";
+                    label += " [SOLD]";
                 }
+                prompt += "\n" + choiceLine(i + 1, label)
+                    + "\n" + detailLine(card.getEffect());
             }
-            prompt += "\n" + removeOption + ": Remove a card ("
-                + removalCost + " Gold)";
+            String service = "Remove a card (" + removalCost + " Gold)";
             if (removalUsedThisVisit)
             {
-                prompt += " [USED]";
+                service += " [USED]";
             }
-            prompt += "\n0: Leave shop";
+            prompt += "\n\nSERVICES\n"
+                + choiceLine(removeOption, service)
+                + "\n\n" + choiceLine(0, "Leave shop");
 
             int choice = askOption(prompt, 0, removeOption);
             if (choice == 0)
@@ -113,12 +116,12 @@ public class ShopSystem
                 ShopItem item = inventory.get(choice - 1);
                 if (purchaseCard(player, deck, item))
                 {
-                    println("Purchased "
+                    println("\nPurchased "
                         + item.getCardType().getName() + ".");
                 }
                 else
                 {
-                    println("Purchase failed.");
+                    println("\nPurchase failed.");
                 }
             }
         }
@@ -128,16 +131,19 @@ public class ShopSystem
     {
         if (removalUsedThisVisit)
         {
-            println("Card removal has already been used in this shop.");
+            println("\nCard removal has already been used in this shop.");
             return;
         }
         Card[] cards = deck.getDeck();
-        String prompt = "Choose a card to remove:";
+        String prompt = title("REMOVE A CARD") + "\nGold: "
+            + player.getGold() + "  |  Cost: " + removalCost
+            + " Gold\n\nCHOOSE A CARD";
         for (int i = 0; i < cards.length; i++)
         {
-            prompt += "\n" + (i + 1) + ": " + cards[i].getName();
+            prompt += "\n" + choiceLine(i + 1, cards[i].getName())
+                + "\n" + detailLine(cards[i].getEffect());
         }
-        prompt += "\n0: Cancel";
+        prompt += "\n\n" + choiceLine(0, "Cancel");
         int choice = askOption(prompt, 0, cards.length);
         if (choice == 0)
         {
@@ -145,11 +151,11 @@ public class ShopSystem
         }
         if (removeCard(player, deck, cards[choice - 1]))
         {
-            println("Removed " + cards[choice - 1].getName() + ".");
+            println("\nRemoved " + cards[choice - 1].getName() + ".");
         }
         else
         {
-            println("Card removal failed.");
+            println("\nCard removal failed.");
         }
     }
 
