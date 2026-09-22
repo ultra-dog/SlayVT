@@ -10,6 +10,7 @@ public class Main
     private static ArrayList<Enemy> enemies = new ArrayList<Enemy>();
     private static BattleSystem battle = new BattleSystem();
     private static RestSystem restSite = new RestSystem();
+    private static ShopSystem shop = new ShopSystem();
     private static int floor = 0;
     private static final int TOTAL_FLOORS = 15;
     private static final int CHEST_FLOORS = 9;
@@ -152,6 +153,7 @@ public class Main
 
                 case "Shop":
                     println("You entered a Shop Room.");
+                    shop.open(player, deck);
                     break;
                 default:
                     println("Content not updated.");

@@ -4,6 +4,10 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+import java.io.PrintStream;
 
 public class ShopSystemTest
 {
@@ -15,7 +19,7 @@ public class ShopSystemTest
     private static int checks;
     private static int failures;
 
-    public static void main(String[] args)
+    public static void main(String[] args) throws Exception
     {
         testPlayerGold();
         testDeckRemoval();
@@ -23,6 +27,7 @@ public class ShopSystemTest
         testSeededInventory();
         testCardPurchases();
         testCardRemovalService();
+        testOpenCanLeave();
 
         if (failures > 0)
         {
@@ -30,6 +35,33 @@ public class ShopSystemTest
                 + " shop checks failed.");
         }
         System.out.println("PASS: " + checks + " shop checks.");
+    }
+
+    private static void testOpenCanLeave() throws Exception
+    {
+        InputStream originalIn = System.in;
+        PrintStream originalOut = System.out;
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        try
+        {
+            System.setIn(new ByteArrayInputStream(
+                "0\n".getBytes("UTF-8")));
+            System.setOut(new PrintStream(output, true, "UTF-8"));
+            new ShopSystem(new Random(5)).open(
+                new Player("Player", 80), new Deck(1));
+        }
+        finally
+        {
+            System.setIn(originalIn);
+            System.setOut(originalOut);
+        }
+        String text = output.toString("UTF-8");
+        check("Shop displays current Gold", true,
+            text.contains("Gold: 99"));
+        check("Shop displays removal price", true,
+            text.contains("Remove a card (75 Gold)"));
+        check("Shop offers a leave option", true,
+            text.contains("0: Leave shop"));
     }
 
     private static void testCardRemovalService()

@@ -1,5 +1,6 @@
 package SlayVTGame;
 
+import static SlayVTGame.ToolClass.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Random;
@@ -64,6 +65,92 @@ public class ShopSystem
     public int getRemovalCost()
     {
         return removalCost;
+    }
+
+    public void open(Player player, Deck deck)
+    {
+        if (player == null || deck == null)
+        {
+            throw new IllegalArgumentException(
+                "Player and deck must not be null.");
+        }
+        ArrayList<ShopItem> inventory = beginVisit();
+        int removeOption = inventory.size() + 1;
+        while (true)
+        {
+            String prompt = "Gold: " + player.getGold() + "\nShop:";
+            for (int i = 0; i < inventory.size(); i++)
+            {
+                ShopItem item = inventory.get(i);
+                Card card = new Card(item.getCardType());
+                prompt += "\n" + (i + 1) + ": " + card.getName()
+                    + " (" + item.getPrice() + " Gold) "
+                    + card.getEffect();
+                if (item.isSold())
+                {
+                    prompt += " [SOLD]";
+                }
+            }
+            prompt += "\n" + removeOption + ": Remove a card ("
+                + removalCost + " Gold)";
+            if (removalUsedThisVisit)
+            {
+                prompt += " [USED]";
+            }
+            prompt += "\n0: Leave shop";
+
+            int choice = askOption(prompt, 0, removeOption);
+            if (choice == 0)
+            {
+                return;
+            }
+            if (choice == removeOption)
+            {
+                openRemovalMenu(player, deck);
+            }
+            else
+            {
+                ShopItem item = inventory.get(choice - 1);
+                if (purchaseCard(player, deck, item))
+                {
+                    println("Purchased "
+                        + item.getCardType().getName() + ".");
+                }
+                else
+                {
+                    println("Purchase failed.");
+                }
+            }
+        }
+    }
+
+    private void openRemovalMenu(Player player, Deck deck)
+    {
+        if (removalUsedThisVisit)
+        {
+            println("Card removal has already been used in this shop.");
+            return;
+        }
+        Card[] cards = deck.getDeck();
+        String prompt = "Choose a card to remove:";
+        for (int i = 0; i < cards.length; i++)
+        {
+            prompt += "\n" + (i + 1) + ": " + cards[i].getName();
+        }
+        prompt += "\n0: Cancel";
+        int choice = askOption(prompt, 0, cards.length);
+        if (choice == 0)
+        {
+            return;
+        }
+        if (removeCard(player, deck, cards[choice - 1]))
+        {
+            println("Removed " + cards[choice - 1].getName() + ".");
+        }
+        else
+        {
+            println("Card removal failed.");
+        }
     }
 
     public boolean removeCard(Player player, Deck deck, Card card)
