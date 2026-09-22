@@ -4,12 +4,14 @@ public class Player extends Character
     //~ Fields ................................................................
     private int energy;
     private int maxEnergy;
+    private int gold;
     
     //~ Constructors ..........................................................
     public Player(String name, int maxHp) {
         super(name, maxHp);
         energy = 3;
         maxEnergy = 3;
+        gold = 99;
     }
     //~Public  Methods ........................................................
     public int getEnergy() {
@@ -30,5 +32,35 @@ public class Player extends Character
     
     public void spendEnergy(int cost) {
         energy -= cost;
+    }
+
+    public int getGold()
+    {
+        return gold;
+    }
+
+    public void addGold(int amount)
+    {
+        if (amount < 0)
+        {
+            throw new IllegalArgumentException(
+                "Gold amount must not be negative.");
+        }
+        gold += amount;
+    }
+
+    public boolean spendGold(int amount)
+    {
+        if (amount < 0)
+        {
+            throw new IllegalArgumentException(
+                "Gold amount must not be negative.");
+        }
+        if (amount > gold)
+        {
+            return false;
+        }
+        gold -= amount;
+        return true;
     }
 }
