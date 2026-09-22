@@ -147,12 +147,10 @@ public class Main
                     break;
 
                 case "RestSite":
-                    println("You entered a Rest Site.");
                     restSite.rest(player, deck);
                     break;
 
                 case "Shop":
-                    println("You entered a Shop Room.");
                     shop.open(player, deck);
                     break;
                 default:

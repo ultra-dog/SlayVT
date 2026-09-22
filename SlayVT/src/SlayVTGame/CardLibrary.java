@@ -6,8 +6,8 @@ public enum CardLibrary
 {
     STRIKE("Strike", 1, "Attack", true),
     DEFEND("Defend", 1, "Skill", true),
-    BREEZE("Breeze", 1, "Skill", false),
-    BURN("Burn", 1, "Skill", false),
+    BREEZE("Breeze", 1, "Skill", true),
+    BURN("Burn", 1, "Skill", true),
     HEAT_STRIKE("Heat Strike", 1, "Attack", true),
     SCORCH_PINCER("Scorch Pincer", 1, "Skill", true),
     RED_HOT_FORM("Red Hot Form", 3, "Power", true),
