@@ -22,6 +22,7 @@ public class ShopSystemTest
         testShopItemValidation();
         testSeededInventory();
         testCardPurchases();
+        testCardRemovalService();
 
         if (failures > 0)
         {
@@ -29,6 +30,93 @@ public class ShopSystemTest
                 + " shop checks failed.");
         }
         System.out.println("PASS: " + checks + " shop checks.");
+    }
+
+    private static void testCardRemovalService()
+    {
+        ShopSystem shop = new ShopSystem(new Random(2));
+        shop.beginVisit();
+        Player player = new Player("Player", 80);
+        Deck deck = new Deck(1);
+        Card first = deck.getDeck()[0];
+        int initialSize = deck.size();
+
+        check("Initial removal costs 75", 75, shop.getRemovalCost());
+        check("First removal succeeds", true,
+            shop.removeCard(player, deck, first));
+        check("Removal deducts Gold", 24, player.getGold());
+        check("Removal changes deck size", initialSize - 1, deck.size());
+        check("Next removal costs 100", 100, shop.getRemovalCost());
+
+        Card second = deck.getDeck()[0];
+        check("Second removal in one visit fails", false,
+            shop.removeCard(player, deck, second));
+        check("Rejected repeat does not charge", 24, player.getGold());
+        check("Rejected repeat preserves deck", initialSize - 1,
+            deck.size());
+
+        shop.beginVisit();
+        player.addGold(76);
+        check("New visit permits removal", true,
+            shop.removeCard(player, deck, second));
+        check("New visit uses increased price", 0, player.getGold());
+        check("Next successful price is 125", 125, shop.getRemovalCost());
+
+        ShopSystem invalidShop = new ShopSystem(new Random(3));
+        invalidShop.beginVisit();
+        Player invalidPlayer = new Player("Player", 80);
+        Deck invalidDeck = new Deck(1);
+        int invalidSize = invalidDeck.size();
+        check("Foreign card removal fails", false, invalidShop.removeCard(
+            invalidPlayer, invalidDeck, new Card(CardLibrary.STRIKE)));
+        check("Foreign card does not charge", 99, invalidPlayer.getGold());
+        check("Foreign card preserves deck", invalidSize,
+            invalidDeck.size());
+
+        while (invalidDeck.size() > 1)
+        {
+            invalidDeck.removeCard(invalidDeck.getDeck()[0]);
+        }
+        Card finalCard = invalidDeck.getDeck()[0];
+        check("Shop cannot remove final card", false,
+            invalidShop.removeCard(invalidPlayer, invalidDeck, finalCard));
+        check("Final-card rejection does not charge", 99,
+            invalidPlayer.getGold());
+
+        ShopSystem poorShop = new ShopSystem(new Random(4));
+        poorShop.beginVisit();
+        Player poorPlayer = new Player("Poor", 80);
+        poorPlayer.spendGold(99);
+        Deck poorDeck = new Deck(1);
+        int poorSize = poorDeck.size();
+        check("Unaffordable removal fails", false, poorShop.removeCard(
+            poorPlayer, poorDeck, poorDeck.getDeck()[0]));
+        check("Unaffordable removal preserves deck", poorSize,
+            poorDeck.size());
+        check("Failed removal preserves price", 75,
+            poorShop.getRemovalCost());
+
+        checkThrows("Null removal player is rejected", new TestAction()
+        {
+            public void run()
+            {
+                invalidShop.removeCard(null, invalidDeck, finalCard);
+            }
+        });
+        checkThrows("Null removal deck is rejected", new TestAction()
+        {
+            public void run()
+            {
+                invalidShop.removeCard(invalidPlayer, null, finalCard);
+            }
+        });
+        checkThrows("Null removal card is rejected", new TestAction()
+        {
+            public void run()
+            {
+                invalidShop.removeCard(invalidPlayer, invalidDeck, null);
+            }
+        });
     }
 
     private static void testCardPurchases()

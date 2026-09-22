@@ -61,6 +61,49 @@ public class ShopSystem
         return true;
     }
 
+    public int getRemovalCost()
+    {
+        return removalCost;
+    }
+
+    public boolean removeCard(Player player, Deck deck, Card card)
+    {
+        if (player == null || deck == null || card == null)
+        {
+            throw new IllegalArgumentException(
+                "Player, deck, and card must not be null.");
+        }
+        if (removalUsedThisVisit || deck.size() <= 1
+            || !containsIdentity(deck, card))
+        {
+            return false;
+        }
+        if (!player.spendGold(removalCost))
+        {
+            return false;
+        }
+        if (!deck.removeCard(card))
+        {
+            player.addGold(removalCost);
+            return false;
+        }
+        removalUsedThisVisit = true;
+        removalCost += 25;
+        return true;
+    }
+
+    private boolean containsIdentity(Deck deck, Card target)
+    {
+        for (Card card : deck.getDeck())
+        {
+            if (card == target)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private ArrayList<CardLibrary> cardsOfType(String type)
     {
         ArrayList<CardLibrary> cards = new ArrayList<CardLibrary>();
