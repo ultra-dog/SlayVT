@@ -39,4 +39,26 @@ public class Deck
     {
         return deck.toArray(new Card[0]);
     }
+
+    public int size()
+    {
+        return deck.size();
+    }
+
+    public boolean removeCard(Card card)
+    {
+        if (card == null || deck.size() <= 1)
+        {
+            return false;
+        }
+        for (int i = 0; i < deck.size(); i++)
+        {
+            if (deck.get(i) == card)
+            {
+                deck.remove(i);
+                return true;
+            }
+        }
+        return false;
+    }
 }

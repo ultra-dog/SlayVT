@@ -13,6 +13,7 @@ public class ShopSystemTest
     public static void main(String[] args)
     {
         testPlayerGold();
+        testDeckRemoval();
 
         if (failures > 0)
         {
@@ -20,6 +21,29 @@ public class ShopSystemTest
                 + " shop checks failed.");
         }
         System.out.println("PASS: " + checks + " shop checks.");
+    }
+
+    private static void testDeckRemoval()
+    {
+        Deck deck = new Deck(1);
+        int initialSize = deck.size();
+        Card selected = deck.getDeck()[0];
+        check("Selected card is removed", true, deck.removeCard(selected));
+        check("Removal decreases deck size", initialSize - 1, deck.size());
+        check("The same card cannot be removed twice", false,
+            deck.removeCard(selected));
+        check("A foreign card reference is rejected", false,
+            deck.removeCard(new Card(CardLibrary.STRIKE)));
+        check("Null card removal is rejected", false, deck.removeCard(null));
+
+        while (deck.size() > 1)
+        {
+            deck.removeCard(deck.getDeck()[0]);
+        }
+        Card lastCard = deck.getDeck()[0];
+        check("The final card cannot be removed", false,
+            deck.removeCard(lastCard));
+        check("Final card remains in deck", 1, deck.size());
     }
 
     private static void testPlayerGold()
