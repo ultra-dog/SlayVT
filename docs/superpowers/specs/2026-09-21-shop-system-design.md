@@ -124,4 +124,4 @@ The test will cover:
 
 ## Commit Boundary
 
-The shop implementation, its tests, and `Main` integration will be reviewed and committed together as one focused code commit. The user's existing `SlayVT/.project` modification will not be staged or committed.
+The shop implementation will be committed in small, tested steps: player Gold, safe deck removal, inventory, purchases, removal service, and console integration. The user's existing `SlayVT/.project` modification will not be staged or committed.
