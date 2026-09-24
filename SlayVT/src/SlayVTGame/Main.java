@@ -11,6 +11,7 @@ public class Main
     private static BattleSystem battle = new BattleSystem();
     private static RestSystem restSite = new RestSystem();
     private static ShopSystem shop = new ShopSystem();
+    private static CardRewardSystem cardRewards = new CardRewardSystem();
     private static int floor = 0;
     private static final int TOTAL_FLOORS = 15;
     private static final int CHEST_FLOORS = 9;
@@ -123,6 +124,7 @@ public class Main
                     if (battle.fight(player, enemies, deck))
                     {
                         println("\nBattle won.");
+                        cardRewards.offer(deck);
                     }
                     else
                     {
@@ -137,6 +139,7 @@ public class Main
                     if (battle.fight(player, enemies, deck))
                     {
                         println("\nBattle won.");
+                        cardRewards.offer(deck);
                     }
                     else
                     {
