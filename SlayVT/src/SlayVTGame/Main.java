@@ -18,6 +18,13 @@ public class Main
 
     public static void main(String[] args)
     {
+        int mode = askOption(
+            title("GAME MODE") + "\n"
+                + choiceLine(1, "Normal Game") + "\n"
+                + choiceLine(2, "Test Mode"),
+            1,
+            2);
+        int startingFloor = chooseStartingFloor(mode);
         String name = askName();
 
         int characterNum = askOption(
@@ -44,7 +51,7 @@ public class Main
         boolean shopOffered = false;
         boolean eliteOffered = false;
 
-        for (floor = 1; floor <= TOTAL_FLOORS; floor++)
+        for (floor = startingFloor; floor <= TOTAL_FLOORS; floor++)
         {
             println(title("FLOOR " + floor + " / " + TOTAL_FLOORS));
             println("HP: " + player.getHp() + "/" + player.getMaxHp()
@@ -154,5 +161,17 @@ public class Main
                     break;
             }
         }
+    }
+
+    static int chooseStartingFloor(int mode)
+    {
+        if (mode == 1)
+        {
+            return 1;
+        }
+        return askOption(
+            title("TEST MODE") + "\nChoose starting floor (1-15):",
+            1,
+            TOTAL_FLOORS);
     }
 }
