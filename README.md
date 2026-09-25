@@ -49,7 +49,7 @@ JUnit 4 tests are in `SlayVT/test/SlayVTGame/`. In Eclipse, right-click `CoreGam
 
 ## Presentation
 
-The [Deliverable 3 presentation](docs/SlayVT_Deliverable3.pptx) is an editable, white-background slide deck for the group's final talk and live demonstration. The team can add its own visual styling before submitting the slides to Canvas.
+The [Deliverable 3 presentation](docs/SlayVT_Deliverable3.pptx) is the group's final editable slide deck for the talk and live demonstration. It includes the system diagram, a project code example, and Virginia Tech colors with card-and-spire artwork.
 
 ## Project layout
 
