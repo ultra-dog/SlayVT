@@ -2,6 +2,8 @@
 
 SlayVT is a Java 8, text-based deck-building game created for CS 2114 Project 1 at Virginia Tech. Play through a 15-floor run, choose rooms, build and upgrade a deck, and fight enemies using Heat and Cold. Reversing a target's temperature deals temperature-difference damage.
 
+Public repository: [ultra-dog/SlayVT](https://github.com/ultra-dog/SlayVT).
+
 ## Requirements
 
 - Java Development Kit (JDK) 8 or newer. A JRE alone cannot compile the source.
@@ -44,6 +46,10 @@ JUnit 4 tests are in `SlayVT/test/SlayVTGame/`. In Eclipse, right-click `CoreGam
 ## System diagram
 
 ![SlayVT system architecture and class relationships](docs/system-diagram.png)
+
+## Presentation
+
+The [Deliverable 3 presentation](docs/SlayVT_Deliverable3.pptx) is an editable, white-background slide deck for the group's final talk and live demonstration. The team can add its own visual styling before submitting the slides to Canvas.
 
 ## Project layout
 
