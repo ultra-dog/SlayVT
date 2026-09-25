@@ -1,6 +1,6 @@
 package SlayVTGame;
 
-public class BuffEffect implements CardEffect
+public class BuffEffect extends CardEffect
 {
     public enum BuffType
     {

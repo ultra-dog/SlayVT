@@ -33,7 +33,6 @@ Heat deals damage at the end of your turn. Cold and Heat use signed temperature 
 The repository currently contains self-contained Java test classes with `main` methods. After compiling, run a test by name, for example:
 
 ```sh
-java -cp build SlayVTGame.AdditionalCardsTest
 java -cp build SlayVTGame.CardMechanicsTest
 java -cp build SlayVTGame.TemperatureTest
 ```

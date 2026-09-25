@@ -1,6 +1,6 @@
 package SlayVTGame;
 
-public class DamageEffect implements CardEffect
+public class DamageEffect extends CardEffect
 {
     private final int dmg;
     private final int hitCount;

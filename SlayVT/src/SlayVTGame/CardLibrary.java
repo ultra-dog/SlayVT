@@ -126,55 +126,28 @@ public enum CardLibrary
                 return new BuffEffect(BuffType.TEMPERATURE,
                     upgraded ? 3 : 2);
             case HEAT_STRIKE:
-                return new HeatStrikeEffect(
-                    upgraded ? 10 : 8,
-                    upgraded ? 2 : 1);
             case SCORCH_PINCER:
-                return new ScorchPincerEffect(upgraded ? 3 : 2);
             case RED_HOT_FORM:
-                return new RedHotFormEffect();
             case OVERBURN:
-                return new OverburnEffect(
-                    upgraded ? 5 : 4,
-                    upgraded ? 3 : 2);
             case HIDDEN_SCORCH:
-                return new HiddenScorchEffect(upgraded ? 15 : 12);
             case FROZEN_HEART:
-                return new FrozenHeartEffect(upgraded ? 3 : 2);
             case SCATTER_ICE:
-                return new ScatterIceEffect();
             case VOID_FREEZE:
-                return new VoidFreezeEffect(3, upgraded ? 2 : 1);
             case FRONT_FORM:
-                return new FrontFormEffect(upgraded ? 2 : 1);
             case DROUGHT:
-                return new DroughtEffect(upgraded ? 50 : 25);
             case PHASE_ARMOR:
-                return new PhaseArmorEffect(upgraded ? 5 : 4);
             case HEAT_EXCHANGER:
-                return new HeatExchangerEffect();
             case GLACIER_COLLAPSE:
-                return new GlacierCollapseEffect(upgraded ? 16 : 12);
             case CORONAL_ERUPTION:
-                return new CoronalEruptionEffect(upgraded ? 16 : 12);
             case FORCED_SEASONS:
-                return new ForcedSeasonsEffect();
             case CLIMATE_SHELTER:
-                return new ClimateShelterEffect(upgraded ? 5 : 3);
             case BLAZING_SUN:
-                return new AllTemperatureEffect(upgraded ? 8 : 6);
             case BITING_WIND:
-                return new AllTemperatureEffect(upgraded ? -8 : -6);
             case SUNBURN:
-                return new ConditionalStatusEffect(true,
-                    upgraded ? 3 : 2);
             case NO_AC:
-                return new NoAcEffect();
             case FROSTBITE:
-                return new ConditionalStatusEffect(false,
-                    upgraded ? 3 : 2);
             case COLD_ADAPTATION:
-                return new ColdAdaptationEffect(upgraded ? 6 : 4);
+                return new CardEffect(this, upgraded);
             default:
                 throw new IllegalStateException("Unknown card: " + this);
         }
