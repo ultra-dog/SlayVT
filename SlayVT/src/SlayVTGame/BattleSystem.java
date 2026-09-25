@@ -47,7 +47,7 @@ public class BattleSystem
             while (player.checkAlive() && hasLivingEnemies(enemies))
             {
                 printPlayer(player);
-                printEnemies(enemies);
+                printEnemies(enemies, player);
 
                 int option = askOption(
                     printOptions(piles.mutableHand()),
@@ -85,7 +85,8 @@ public class BattleSystem
                     }
 
                     int targetOption = askOption(
-                        printEnemyOption(targets), 0, targets.size());
+                        printEnemyOption(targets, player), 0,
+                        targets.size());
                     if (targetOption == 0)
                     {
                         continue;
@@ -125,16 +126,7 @@ public class BattleSystem
                     continue;
                 }
 
-                enemy.getBuffs().startTurn();
-                enemy.setBlock(0);
-
-                int damage = Buffs.calculateDamage(
-                    enemy.getDmg(), enemy.getBuffs(), player.getBuffs());
-
-                println("  " + enemy.getName() + " attacks for "
-                    + damage + " damage.");
-                player.takeDamage(damage);
-                enemy.getBuffs().endTurn();
+                enemy.takeTurn(player);
             }
 
             turn++;

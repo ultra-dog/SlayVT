@@ -105,13 +105,20 @@ public final class ToolClass
 
     public static void printEnemies(ArrayList<Enemy> enemies)
     {
+        printEnemies(enemies, null);
+    }
+
+    public static void printEnemies(ArrayList<Enemy> enemies, Player player)
+    {
         println("\nENEMIES");
         for (int i = 0; i < enemies.size(); i++)
         {
             Enemy temp = enemies.get(i);
+            String intent = player == null ? temp.getIntent()
+                : temp.getIntent(player);
             println(choiceLine(i + 1, temp.getName()
                 + "  |  HP: " + temp.getHp() + "/" + temp.getMaxHp()
-                + "  |  Intent: " + temp.getDmg() + " damage"));
+                + "  |  Intent: " + intent));
             String statuses = temp.getBuffs().toString();
             if (temp.checkAlive() && !"None".equals(statuses))
             {
@@ -138,13 +145,21 @@ public final class ToolClass
 
     public static String printEnemyOption(ArrayList<Enemy> enemies)
     {
+        return printEnemyOption(enemies, null);
+    }
+
+    public static String printEnemyOption(
+        ArrayList<Enemy> enemies, Player player)
+    {
         String txt = "\nCHOOSE TARGET\n";
         for (int i = 0; i < enemies.size(); i++)
         {
             Enemy temp = enemies.get(i);
+            String intent = player == null ? temp.getIntent()
+                : temp.getIntent(player);
             txt += choiceLine(i + 1, temp.getName() + "  |  HP: "
                 + temp.getHp() + "/" + temp.getMaxHp()
-                + "  |  Intent: " + temp.getDmg() + " damage") + "\n";
+                + "  |  Intent: " + intent) + "\n";
         }
         txt += "\n" + choiceLine(0, "Cancel");
         return txt;
