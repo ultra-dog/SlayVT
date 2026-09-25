@@ -41,7 +41,7 @@ Other test classes are in `SlayVT/src/SlayVTGame/` and end in `Test.java`. `Sour
 
 ## System diagram
 
-![SlayVT system diagram](docs/system-diagram.png)
+![SlayVT system architecture and class relationships](docs/system-diagram.png)
 
 ## Project layout
 
