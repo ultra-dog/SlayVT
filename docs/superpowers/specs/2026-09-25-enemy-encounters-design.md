@@ -1,53 +1,53 @@
-# SlayVT Enemy Encounters Design
+# SlayVT 敌人遭遇系统设计
 
-## Goal and scope
+## 目标与范围
 
-Replace the placeholder fixed-attack enemies with a small, readable roster for the existing 15-floor text game: nine normal enemies, two rarer and stronger elites, and one creative boss on floor 15. A normal enemy may appear only once per run; a new run resets that history. Keep the existing card rewards and unrelated rooms unchanged.
+把现有 15 层文字游戏中的固定攻击占位敌人，替换为规模适中的敌人名单：9 种普通敌人、2 种较少遇到且更强的精英，以及第 15 层的 1 个特色 Boss。同一局中，每种普通敌人最多出现一次；新一局重新开始计数。现有卡牌奖励和其他房间保持不变。
 
-The confirmed implementation approach is a shared set of moves, not one class per enemy or a name-based switch in `BattleSystem`. Enemy-applied temperature follows the same core rules as temperature on monsters.
+已确认采用一套共用招式来定义敌人，而不是为每只敌人创建一个类，也不在 `BattleSystem` 中按名字写大量 `switch`。敌人施加的温度遵循怪物身上温度的相同核心规则。
 
-## Floors and selection
+## 楼层与抽取规则
 
-- Floor 1 draws a normal enemy from the early pool. Floors 1-4 use the early pool, 5-8 the middle pool, and 10-13 the late pool. Floor 9 remains a chest, floor 14 a rest site, and floor 15 the sole boss.
-- Each pool contains three normal definitions. Selecting a normal fight draws an unused definition from that floor's pool and removes it from the run's available set. A pool may be exhausted; then `Monster` is omitted from room choices until the next pool. This guarantees no repeated normal encounter without requiring twelve designs.
-- Elites may be offered on floors 4-7 and 10-12. On each eligible floor, if the current elite band has not had a selected elite fight and the previous floor did not offer Elite, there is a 15% chance that Elite is shown as one option. An Elite offer always has a second non-elite option. At most one elite fight occurs in each band. Skipping an offer does not consume that band's elite fight.
-- Normal room choices retain the existing one- or two-option text menu and all non-elite room rules. `Event` remains available, so exhaustion cannot leave an empty menu. Randomness must be injectable for deterministic tests.
+- 第 1 层从前期普通敌人池抽取。第 1–4 层使用前期池，第 5–8 层使用中期池，第 10–13 层使用后期池。第 9 层仍为宝箱，第 14 层仍为休息点，第 15 层固定为唯一 Boss。
+- 每个普通敌人池有 3 种敌人。选择普通战后，从当前楼层对应的池中随机抽取尚未出现的敌人，并将其从本局候选名单中移除。若当前阶段的池已抽空，在进入下一个阶段之前，房间选项中不再出现 `Monster`。这样不用设计 12 种普通敌人，也能保证同一局的普通战不重复。
+- 精英只可能在第 4–7 层和第 10–12 层作为房间选项出现。若该阶段还没有打过精英，且上一层没有提供过 `Elite` 选项，则本层有 15% 的概率显示 `Elite`。出现精英选项时，必须同时提供另一个非精英选项。每个阶段最多打一场精英；跳过精英选项不消耗该阶段的精英机会。
+- 普通房间继续使用现有的 1–2 个文字选项，并保留其他非精英房间的规则。`Event` 始终可选，因此敌人池抽空不会导致菜单为空。随机源应可注入，以便编写结果可重复的测试。
 
-## Enemy roster
+## 敌人名单
 
-Numbers below are initial implementation values, not a promise of final balance. `A` means attack damage before Weak/Vulnerable, `B` means block, `W` means Weak turns on the player, `V` means Vulnerable turns on the player, and `T` means temperature change on the player. A plus sign combines effects in one move; arrows show repeating move order.
+下表数值是首次实现时使用的数值，后续可根据实测调整。`A` 表示计算虚弱、易伤之前的攻击伤害，`B` 表示格挡，`W` 表示施加给玩家的虚弱回合数，`V` 表示施加给玩家的易伤回合数，`T` 表示玩家温度变化。加号表示同一招式包含多个效果；箭头表示按顺序循环使用招式。
 
-| Pool | Enemy | HP | Repeating moves |
+| 阶段 | 敌人 | 生命值 | 循环招式 |
 | --- | --- | ---: | --- |
-| Early | Lost Freshman | 16 | A5 -> B5 + A3 |
-| Early | Dining Queue Ghost | 18 | A5 -> A3 + W1 |
-| Early | Library Wisp | 18 | A5 -> B6 |
-| Middle | Lab Spark | 24 | Charge (no damage) -> A11 |
-| Middle | Drillfield Crow | 24 | 2 hits of A4 -> A7 |
-| Middle | Lecture Hall Frost | 26 | A6 + T-2 -> A8 |
-| Late | Construction Golem | 34 | B10 -> A12 |
-| Late | All-Nighter Shade | 32 | A7, gaining 2 damage after each attack, capped at A13 |
-| Late | Exam Mimic | 32 | V2 -> A12 |
-| Early elite | Hokie Stone Guardian | 50 | B10 -> A13 -> 2 hits of A7 |
-| Late elite | Overloaded Reactor | 54 | T+1 + Charge -> A15 -> A8 |
+| 前期 | 迷路新生 Lost Freshman | 16 | A5 → B5 + A3 |
+| 前期 | 食堂排队幽灵 Dining Queue Ghost | 18 | A5 → A3 + W1 |
+| 前期 | 图书馆纸灵 Library Wisp | 18 | A5 → B6 |
+| 中期 | 实验室火花 Lab Spark | 24 | 蓄力（不造成伤害）→ A11 |
+| 中期 | 操场乌鸦 Drillfield Crow | 24 | A4 攻击两次 → A7 |
+| 中期 | 冷气幽灵 Lecture Hall Frost | 26 | A6 + T-2 → A8 |
+| 后期 | 施工石像 Construction Golem | 34 | B10 → A12 |
+| 后期 | 熬夜暗影 All-Nighter Shade | 32 | 从 A7 开始，每次攻击后增加 2 点伤害，最高 A13 |
+| 后期 | 期末试卷怪 Exam Mimic | 32 | V2 → A12 |
+| 前期精英 | 霍基石守卫 Hokie Stone Guardian | 50 | B10 → A13 → A7 攻击两次 |
+| 后期精英 | 失控实验核心 Overloaded Reactor | 54 | T+1 + 蓄力 → A15 → A8 |
 
-The Exam Mimic applies two status turns because the current `Buffs` duration logic decrements one at the end of the player's intervening turn; its following attack must still see Vulnerable. Charge is an intent-bearing move and never deals hidden damage.
+期末试卷怪施加 2 回合易伤，是因为现有 `Buffs` 会在玩家中间那个回合结束时减少 1 回合；这样它下一次攻击时，易伤仍然有效。蓄力必须显示为意图，本回合不暗中造成伤害。
 
-### Floor-15 boss: Burruss Bellkeeper
+### 第 15 层 Boss：伯勒斯钟楼守卫 Burruss Bellkeeper
 
-The boss has 90 HP and a visible bell countdown. Its first phase repeats `A8 -> B8 + Charge -> Bell Strike A16`. Once its HP is at or below 45, it changes to `B8 + Charge -> Bell Strike A18`. Crossing the threshold never silently replaces the move already displayed for the current player turn; the shorter cycle begins with the next preview. Charge explicitly previews the next bell strike. The boss does not summon other enemies or add new status types.
+Boss 拥有 90 点生命值，并显示钟声倒计时。第一阶段循环使用 `A8 → B8 + 蓄力 → 钟声重击 A16`。生命值降到 45 或以下后，改为循环使用 `B8 + 蓄力 → 钟声重击 A18`。跨过半血线不会暗中替换当前玩家回合已经显示的招式；缩短后的循环从下一次意图预告开始。蓄力时须明确预告下一次钟声重击。Boss 不召唤其他敌人，也不增加新的状态类型。
 
-## Combat architecture and timing
+## 战斗架构与结算时序
 
-- An enemy definition supplies name, HP, and a small ordered move sequence. Each `Enemy` instance owns its current sequence position and any per-instance damage growth or boss phase. Keep the existing `Enemy(String, int, int)` constructor for current tests and simple dummy enemies, treating it as a one-move repeating attack.
-- A shared move can attack once or multiple times, grant block, apply existing Weak/Vulnerable, change temperature, and/or display Charge. `Enemy` exposes its current intent without advancing. `BattleSystem` executes exactly that intent once on the enemy turn, then advances the move; `ToolClass` displays the same intent before the player chooses cards.
-- Weak/Vulnerable affect attack damage through the existing `Buffs.calculateDamage`. Hits resolve separately so block and HP change correctly. Enemy block lasts through the next player turn and is cleared at the start of that enemy's next action, matching current timing.
-- Applying temperature to a player uses `Buffs.setTemperature` just as for a monster: same-sign values accumulate; an opposite-sign application replaces the temperature and deals three times the absolute difference as blockable reversal damage, modified by the acting enemy's Weak and the player's Vulnerable. Cold alone has no periodic damage.
-- Positive temperature on the player deals end-of-player-turn unblockable heat damage using the same base thresholds as positive temperature on enemies. Player-card offensive heat multipliers, including Red Hot Form, continue to apply only to damage dealt to enemies, not to heat inflicted on the player by enemies. Combat-end cleanup still clears temperature and other temporary buffs.
-- If heat or a move kills the player, the battle stops without executing later enemies. If the last enemy dies during the player turn, combat ends before any end-turn heat or enemy action, as it does today.
+- 一份敌人定义包含名字、生命值和按顺序执行的招式。每个 `Enemy` 实例保存自己的招式位置，以及需要的伤害成长或 Boss 阶段状态。保留现有的 `Enemy(String, int, int)` 构造方法，供已有测试和简单测试敌人使用；这类敌人每回合重复一次固定攻击。
+- 共用招式可以攻击一次或多次、获得格挡、施加已有的虚弱或易伤、改变温度，以及显示蓄力。`Enemy` 能读取当前意图而不推进招式；`BattleSystem` 在敌人回合准确执行该意图一次，然后推进到下一招；`ToolClass` 在玩家选牌前显示同一个意图。
+- 攻击伤害仍通过现有的 `Buffs.calculateDamage` 计算虚弱和易伤。多次攻击逐次结算，使格挡和生命值变化正确。敌人格挡会持续到下一次玩家回合，并在该敌人下一次行动开始时清除，沿用当前时序。
+- 敌人向玩家施加温度时，像对怪物一样使用 `Buffs.setTemperature`：同号温度累加；异号温度替换旧值，并造成温差绝对值 3 倍的可被格挡伤害。这次反转伤害受行动敌人的虚弱和玩家的易伤影响。负温度本身没有每回合伤害。
+- 玩家的正温度在玩家回合结束时造成无视格挡的热伤害，基础倍率阈值与怪物一致。玩家卡牌提供的进攻性热伤害增幅（包括 Red Hot Form）仍只增强对敌人的伤害，不会放大敌人施加给玩家的热伤害。战斗结束后仍清除温度及其他临时状态。
+- 如果热伤害或某个招式杀死玩家，战斗立即停止，不执行后续敌人的行动。如果最后一只敌人在玩家回合中死亡，则像当前逻辑一样，直接结束战斗，不再结算回合末热伤害或敌人行动。
 
-## Boundaries and verification
+## 边界与验证
 
-This change does not add relics, enemy groups, extra bosses, rewards, or new room types. It does not alter the user's existing `.project` change.
+本次不增加遗物、多敌人组合、额外 Boss、奖励或新房间类型；也不修改用户现有的 `.project` 改动。
 
-Tests will verify roster size and floor pools, no repeated normal enemy within one run, pool exhaustion, elite eligibility and deterministic offer rate, current intent matching the executed move, move-cycle and boss-phase transitions, status duration, multi-hit/block behavior, temperature stacking/reversal/heat on the player, and preservation of existing card and terminal-layout tests. A short interactive run will verify the text previews and floor-15 boss flow before the code commit.
+测试应覆盖：敌人名单数量和楼层分池、同一局普通敌人不重复、敌人池抽空、精英出场楼层及可重复验证的出现概率、显示意图与实际招式一致、招式循环和 Boss 阶段切换、状态持续时间、多次攻击与格挡、玩家身上的温度累加／反转／热伤害，以及现有卡牌与终端排版测试。提交代码前，还需进行一次简短的交互游玩检查，确认文字意图和第 15 层 Boss 流程。
