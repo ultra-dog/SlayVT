@@ -92,19 +92,21 @@ public class Buffs
     public int getHeatEndTurnDamage(int heat)
     {
         int safeHeat = Math.max(heat, 0);
-        int thresholdMultiplier = 1;
-
-        if (safeHeat >= 16)
+        long damage = getBaseHeatEndTurnDamage(safeHeat);
+        if (redHotForm && safeHeat >= 8)
         {
-            thresholdMultiplier = redHotForm ? 4 : 3;
+            damage += safeHeat;
         }
-        else if (safeHeat >= 8)
-        {
-            thresholdMultiplier = redHotForm ? 3 : 2;
-        }
+        damage *= temporaryHeatMultiplier;
+        return damage > Integer.MAX_VALUE
+            ? Integer.MAX_VALUE : (int)damage;
+    }
 
-        long damage = (long)safeHeat * thresholdMultiplier
-            * temporaryHeatMultiplier;
+    public static int getBaseHeatEndTurnDamage(int heat)
+    {
+        int safeHeat = Math.max(heat, 0);
+        int multiplier = safeHeat >= 16 ? 3 : safeHeat >= 8 ? 2 : 1;
+        long damage = (long)safeHeat * multiplier;
         return damage > Integer.MAX_VALUE
             ? Integer.MAX_VALUE : (int)damage;
     }

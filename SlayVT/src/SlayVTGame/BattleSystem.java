@@ -112,6 +112,11 @@ public class BattleSystem
 
             context.resolvePlayerEndOfTurn();
 
+            if (!player.checkAlive() || !hasLivingEnemies(enemies))
+            {
+                break;
+            }
+
             println("\nENEMY TURN");
 
             for (Enemy enemy : enemies)

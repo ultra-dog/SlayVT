@@ -79,6 +79,59 @@ public class TemperatureTest
         check("Temperature cards spend their normal energy", 1,
             player.getEnergy());
 
+        Player heated = new Player("Heated", 80);
+        Enemy reactor = new Enemy("Reactor", 20, 0);
+        heated.getBuffs().setTemperature(-2);
+        TemperatureEffect.applyEnemy(reactor, heated, 2);
+        check("Enemy reversal damage", 68, heated.getHp());
+        check("Enemy reversal temperature", 2,
+            heated.getBuffs().getTemperature());
+        heated.getBuffs().setTemperature(0);
+        heated.getBuffs().setTemperature(8);
+        heated.getBuffs().enableRedHotForm();
+        BattleContext context = new BattleContext(heated,
+            new java.util.ArrayList<Enemy>(), new BattlePiles());
+        context.resolvePlayerEndOfTurn();
+        check("Incoming heat ignores offensive form", 52, heated.getHp());
+
+        Player guarded = new Player("Guarded", 80);
+        guarded.getBuffs().setTemperature(-2);
+        guarded.getBuffs().addVulnerable(1);
+        guarded.addBlock(4);
+        reactor.getBuffs().addWeak(1);
+        TemperatureEffect.applyEnemy(reactor, guarded, 2);
+        check("Modified reversal respects block", 71, guarded.getHp());
+        check("Reversal consumes block", 0, guarded.getBlock());
+
+        Player veryHot = new Player("Very Hot", 100);
+        veryHot.getBuffs().setTemperature(16);
+        veryHot.addBlock(20);
+        new BattleContext(veryHot, new java.util.ArrayList<Enemy>(),
+            new BattlePiles()).resolvePlayerEndOfTurn();
+        check("High heat has same threshold as monsters", 52,
+            veryHot.getHp());
+        check("Heat bypasses block", 20, veryHot.getBlock());
+
+        Player cold = new Player("Cold", 80);
+        cold.getBuffs().setTemperature(-3);
+        new BattleContext(cold, new java.util.ArrayList<Enemy>(),
+            new BattlePiles()).resolvePlayerEndOfTurn();
+        check("Cold has no periodic damage", 80, cold.getHp());
+
+        Player moveTarget = new Player("Move Target", 80);
+        new Enemy("Frost", 20,
+            EnemyMove.attackAndTemperature(6, -2)).takeTurn(moveTarget);
+        check("Attack with cold damages player", 74, moveTarget.getHp());
+        check("Attack with cold changes temperature", -2,
+            moveTarget.getBuffs().getTemperature());
+        Player chargeTarget = new Player("Charge Target", 80);
+        new Enemy("Core", 20,
+            EnemyMove.temperatureCharge(1, 15)).takeTurn(chargeTarget);
+        check("Temperature charge does not attack", 80,
+            chargeTarget.getHp());
+        check("Temperature charge applies heat", 1,
+            chargeTarget.getBuffs().getTemperature());
+
         if (failures > 0)
         {
             throw new AssertionError(failures + " of " + checks

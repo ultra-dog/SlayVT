@@ -58,6 +58,11 @@ public class BattleContext
             enemy.takeUnblockableDamage(damage);
         }
 
+        int playerHeat = Math.max(player.getBuffs().getTemperature(), 0);
+        int playerHeatDamage =
+            Buffs.getBaseHeatEndTurnDamage(playerHeat);
+        player.takeUnblockableDamage(playerHeatDamage);
+
         player.getBuffs().endTurn();
     }
 }

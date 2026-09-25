@@ -42,4 +42,23 @@ public final class TemperatureEffect
             target.takeDamage(finalDamage);
         }
     }
+
+    public static void applyEnemy(Enemy enemy, Player player, int amount)
+    {
+        if (enemy == null || player == null)
+        {
+            throw new IllegalArgumentException(
+                "Enemy and temperature target must not be null.");
+        }
+
+        int temperatureDifference =
+            player.getBuffs().setTemperature(amount);
+        if (temperatureDifference > 0)
+        {
+            int finalDamage = Buffs.calculateDamage(
+                temperatureDifference * 3,
+                enemy.getBuffs(), player.getBuffs());
+            player.takeDamage(finalDamage);
+        }
+    }
 }

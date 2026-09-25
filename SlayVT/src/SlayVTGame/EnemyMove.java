@@ -15,6 +15,7 @@ public class EnemyMove
     private final int nextDamage;
     private final int growth;
     private final int maxDamage;
+    private int temperature;
 
     private EnemyMove(int damage, int hits, int block, int weakTurns,
         int vulnerableTurns, int nextDamage, int growth, int maxDamage)
@@ -69,6 +70,20 @@ public class EnemyMove
         return new EnemyMove(start, 1, 0, 0, 0, 0, step, cap);
     }
 
+    public static EnemyMove attackAndTemperature(int damage, int amount)
+    {
+        EnemyMove move = attack(damage);
+        move.temperature = amount;
+        return move;
+    }
+
+    public static EnemyMove temperatureCharge(int amount, int nextDamage)
+    {
+        EnemyMove move = charge(0, nextDamage);
+        move.temperature = amount;
+        return move;
+    }
+
     public int getBaseDamage()
     {
         return damage;
@@ -96,6 +111,11 @@ public class EnemyMove
         if (vulnerableTurns > 0)
         {
             parts.add("Vulnerable " + vulnerableTurns);
+        }
+        if (temperature != 0)
+        {
+            parts.add("Temperature " + (temperature > 0 ? "+" : "")
+                + temperature);
         }
         if (nextDamage > 0)
         {
@@ -130,6 +150,12 @@ public class EnemyMove
             player.getBuffs().addVulnerable(vulnerableTurns);
             println("  " + enemy.getName() + " applies Vulnerable "
                 + vulnerableTurns + ".");
+        }
+        if (player.checkAlive() && temperature != 0)
+        {
+            TemperatureEffect.applyEnemy(enemy, player, temperature);
+            println("  " + enemy.getName() + " changes your temperature by "
+                + (temperature > 0 ? "+" : "") + temperature + ".");
         }
         if (nextDamage > 0)
         {
