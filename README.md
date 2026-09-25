@@ -39,6 +39,10 @@ java -cp build SlayVTGame.TemperatureTest
 
 Other test classes are in `SlayVT/src/SlayVTGame/` and end in `Test.java`. `SourceLayoutTest` additionally needs the absolute path to `SlayVT/src` as its argument. These tests are not JUnit tests; conversion to JUnit remains work for the final deliverable.
 
+## System diagram
+
+![SlayVT system diagram](docs/system-diagram.png)
+
 ## Project layout
 
 - `SlayVT/src/SlayVTGame/Main.java` — game entry point and floor progression.
@@ -46,5 +50,3 @@ Other test classes are in `SlayVT/src/SlayVTGame/` and end in `Test.java`. `Sour
 - `SlayVT/src/SlayVTGame/BattleSystem.java` — turn-based battles.
 - `SlayVT/src/SlayVTGame/TemperatureEffect.java` — Heat/Cold reversal damage.
 - `SlayVT/src/SlayVTGame/*Test.java` — current executable tests.
-
-A separate system diagram has not yet been added to the repository.
