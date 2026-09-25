@@ -16,6 +16,7 @@ public class EnemyMove
     private final int growth;
     private final int maxDamage;
     private int temperature;
+    private String chargeLabel = "Charge";
 
     private EnemyMove(int damage, int hits, int block, int weakTurns,
         int vulnerableTurns, int nextDamage, int growth, int maxDamage)
@@ -63,6 +64,13 @@ public class EnemyMove
     public static EnemyMove charge(int block, int nextDamage)
     {
         return new EnemyMove(0, 0, block, 0, 0, nextDamage, 0, 0);
+    }
+
+    public static EnemyMove bellCharge(int block, int nextDamage)
+    {
+        EnemyMove move = charge(block, nextDamage);
+        move.chargeLabel = "Bell in 1 turn";
+        return move;
     }
 
     public static EnemyMove growingAttack(int start, int step, int cap)
@@ -119,7 +127,8 @@ public class EnemyMove
         }
         if (nextDamage > 0)
         {
-            parts.add("Charge: " + nextDamage + " damage next turn");
+            parts.add(chargeLabel + ": " + nextDamage
+                + " damage next turn");
         }
         return join(parts);
     }
@@ -159,8 +168,8 @@ public class EnemyMove
         }
         if (nextDamage > 0)
         {
-            println("  " + enemy.getName() + " charges for "
-                + nextDamage + " damage next turn.");
+            println("  " + enemy.getName() + " prepares " + chargeLabel
+                + " for " + nextDamage + " damage next turn.");
         }
         if (growth > 0 && hits > 0)
         {
