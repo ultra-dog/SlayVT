@@ -7,6 +7,8 @@ public class TestModeTest
 {
     public static void main(String[] args) throws Exception
     {
+        check("Playable character is the Meteorologist",
+            "Meteorologist".equals(Main.CHARACTER_NAME));
         check("Normal mode starts on floor 1",
             Main.chooseStartingFloor(1) == 1);
 

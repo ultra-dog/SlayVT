@@ -30,6 +30,8 @@ public class ReadmeTest
         require(text, "java -cp build SlayVTGame.Main");
         require(text, "### Eclipse");
         require(text, "## Tests");
+        require(text, "Meteorologist");
+        require(text, "Virginia Tech-themed Event rooms");
         System.out.println("PASS: README compile and run instructions.");
     }
 

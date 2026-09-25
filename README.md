@@ -24,9 +24,9 @@ Import the `SlayVT` folder inside this repository as an **Existing Project into 
 
 ## How to play
 
-Choose **Normal Game** to start on floor 1, or **Test Mode** to choose a starting floor for a shorter demonstration. Enter your name and choose the Warrior. Use the numbered menu options to choose rooms and play cards. During battle, choose a card, then an enemy when the card needs a target; enter `0` to end your turn. Cards consume Energy, and your hand is replenished each turn.
+Choose **Normal Game** to start on floor 1, or **Test Mode** to choose a starting floor for a shorter demonstration. Enter your name and choose the Meteorologist. Use the numbered menu options to choose rooms and play cards. During battle, choose a card, then an enemy when the card needs a target; enter `0` to end your turn. Cards consume Energy, and your hand is replenished each turn.
 
-Heat deals damage at the end of your turn. Cold and Heat use signed temperature stacks; switching a target from one to the other deals damage based on the temperature difference. Winning battles can award cards. The shop sells cards and removes one card per visit; the Rest Site can heal you or upgrade a card. The final floor contains the boss.
+Heat deals damage at the end of your turn. Cold and Heat use signed temperature stacks; switching a target from one to the other deals damage based on the temperature difference. Winning battles can award cards. The shop sells cards and removes one card per visit; the Rest Site can heal you or upgrade a card. Virginia Tech-themed Event rooms offer one-time choices involving cards, Gold, or HP. The final floor contains the boss.
 
 ## Tests
 

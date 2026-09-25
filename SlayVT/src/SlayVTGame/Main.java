@@ -5,6 +5,7 @@ import java.util.*;
 
 public class Main
 {
+    static final String CHARACTER_NAME = "Meteorologist";
     private static Player player;
     private static Deck deck;
     private static ArrayList<Enemy> enemies = new ArrayList<Enemy>();
@@ -12,6 +13,7 @@ public class Main
     private static RestSystem restSite = new RestSystem();
     private static ShopSystem shop = new ShopSystem();
     private static CardRewardSystem cardRewards = new CardRewardSystem();
+    private static EventSystem events = new EventSystem();
     private static int floor = 0;
     private static final int TOTAL_FLOORS = 15;
     private static final int CHEST_FLOORS = 9;
@@ -29,7 +31,7 @@ public class Main
 
         int characterNum = askOption(
             title("CHOOSE YOUR CHARACTER") + "\n"
-                + choiceLine(1, "Warrior"),
+                + choiceLine(1, CHARACTER_NAME),
             1,
             1);
 
@@ -90,7 +92,8 @@ public class Main
                     break;
                 default:
                     options = encounters.roomOptions(
-                        floor, restSiteOffered, shopOffered, eliteOffered);
+                        floor, restSiteOffered, shopOffered, eliteOffered,
+                        events.hasAvailableEvent(player, deck));
             }
 
             String prompt = "\nCHOOSE YOUR NEXT ROOM\n";
@@ -141,8 +144,7 @@ public class Main
                     break;
 
                 case "Event":
-                    println(title("EVENT")
-                        + "\nNo event is available yet.");
+                    events.visit(player, deck);
                     break;
 
                 case "RestSite":

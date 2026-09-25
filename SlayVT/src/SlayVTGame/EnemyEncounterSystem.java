@@ -70,17 +70,33 @@ public class EnemyEncounterSystem
     public ArrayList<String> roomOptions(int floor, boolean restOffered,
         boolean shopOffered, boolean eliteOffered)
     {
+        return roomOptions(floor, restOffered, shopOffered,
+            eliteOffered, true);
+    }
+
+    public ArrayList<String> roomOptions(int floor, boolean restOffered,
+        boolean shopOffered, boolean eliteOffered,
+        boolean eventsAvailable)
+    {
         ArrayList<String> available = new ArrayList<String>();
         if (hasNormal(floor))
         {
             available.add("Monster");
         }
-        available.add("Event");
+        if (eventsAvailable)
+        {
+            available.add("Event");
+        }
         if (!restOffered && floor != 13)
         {
             available.add("RestSite");
         }
         if (!shopOffered)
+        {
+            available.add("Shop");
+        }
+
+        if (available.isEmpty())
         {
             available.add("Shop");
         }

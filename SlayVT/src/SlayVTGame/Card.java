@@ -64,6 +64,11 @@ public class Card
         return description;
     }
 
+    public CardLibrary getCardType()
+    {
+        return cardType;
+    }
+
     public boolean isExhaust()
     {
         return keywords.contains(CardKeyword.EXHAUST);
