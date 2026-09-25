@@ -26,6 +26,11 @@ public class CardRewardSystem
 
     public ArrayList<CardLibrary> generateChoices()
     {
+        return generateChoices(3);
+    }
+
+    public ArrayList<CardLibrary> generateChoices(int count)
+    {
         ArrayList<CardLibrary> available = new ArrayList<CardLibrary>();
         for (CardLibrary card : CardLibrary.values())
         {
@@ -36,13 +41,18 @@ public class CardRewardSystem
             }
         }
         Collections.shuffle(available, random);
-        return new ArrayList<CardLibrary>(available.subList(0, 3));
+        return new ArrayList<CardLibrary>(available.subList(0, count));
     }
 
     public void offer(Deck deck)
     {
-        ArrayList<CardLibrary> choices = generateChoices();
-        String prompt = title("CARD REWARD")
+        offer(deck, 3, "CARD REWARD");
+    }
+
+    public void offer(Deck deck, int count, String heading)
+    {
+        ArrayList<CardLibrary> choices = generateChoices(count);
+        String prompt = title(heading)
             + "\nChoose one card to add to your deck:";
         for (int i = 0; i < choices.size(); i++)
         {

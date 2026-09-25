@@ -145,6 +145,9 @@ public class Main
                 case "Shop":
                     shop.open(player, deck);
                     break;
+                case "Chest":
+                    cardRewards.offer(deck, 4, "CHEST");
+                    break;
                 default:
                     println(title(selectedRoom)
                         + "\nContent not updated.");

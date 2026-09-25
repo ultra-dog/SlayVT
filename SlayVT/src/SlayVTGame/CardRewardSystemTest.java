@@ -53,6 +53,34 @@ public class CardRewardSystemTest
                 && output.toString("UTF-8").contains("  1: ")
                 && output.toString("UTF-8").contains("  2: ")
                 && output.toString("UTF-8").contains("  3: "));
+
+        ArrayList<CardLibrary> chestChoices =
+            new CardRewardSystem(new Random(7)).generateChoices(4);
+        check("Chest offers four distinct non-basic cards",
+            chestChoices.size() == 4
+                && new HashSet<CardLibrary>(chestChoices).size() == 4
+                && !chestChoices.contains(CardLibrary.STRIKE)
+                && !chestChoices.contains(CardLibrary.DEFEND));
+        int chestSize = deck.size();
+        output.reset();
+        try
+        {
+            System.setIn(new ByteArrayInputStream("4\n".getBytes("UTF-8")));
+            System.setOut(new PrintStream(output, true, "UTF-8"));
+            new CardRewardSystem(new Random(7)).offer(deck, 4, "CHEST");
+        }
+        finally
+        {
+            System.setIn(savedIn);
+            System.setOut(savedOut);
+        }
+        check("Chest selection adds only the fourth card",
+            deck.size() == chestSize + 1
+                && deck.getDeck()[chestSize].getName()
+                    .equals(chestChoices.get(3).getName()));
+        check("Chest menu has a fourth option",
+            output.toString("UTF-8").contains("CHEST")
+                && output.toString("UTF-8").contains("  4: "));
         System.out.println("PASS: card reward checks.");
     }
 
