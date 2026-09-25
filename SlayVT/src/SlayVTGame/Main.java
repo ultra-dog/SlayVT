@@ -37,6 +37,8 @@ public class Main
         }
 
         deck = new Deck(1);
+        EnemyEncounterSystem encounters =
+            new EnemyEncounterSystem(new Random());
 
         boolean restSiteOffered = false;
         boolean shopOffered = false;
@@ -51,7 +53,7 @@ public class Main
             if (floor == TOTAL_FLOORS)
             {
                 enemies.clear();
-                enemies.add(new Enemy("Boss", 48, 10));
+                enemies.add(EnemyRoster.boss());
 
                 if (battle.fight(player, enemies, deck))
                 {
@@ -80,25 +82,8 @@ public class Main
                     options.add("Chest");
                     break;
                 default:
-                    ArrayList<String> availableRooms = new ArrayList<String>();
-                    availableRooms.add("Monster");
-                    availableRooms.add("Event");
-                    if (!restSiteOffered && floor != TOTAL_FLOORS - 2)
-                    {
-                        availableRooms.add("RestSite");
-                    }
-                    if (!shopOffered)
-                    {
-                        availableRooms.add("Shop");
-                    }
-                    if (!eliteOffered) {
-                        availableRooms.add("Elite");
-                    }
-                    Collections.shuffle(availableRooms, new Random());
-                    options = new ArrayList<String>(
-                        availableRooms.subList(
-                            0,
-                            randomInt(1, Math.min(2, availableRooms.size()))));
+                    options = encounters.roomOptions(
+                        floor, restSiteOffered, shopOffered, eliteOffered);
             }
 
             String prompt = "\nCHOOSE YOUR NEXT ROOM\n";
@@ -119,7 +104,7 @@ public class Main
             {
                 case "Monster":
                     enemies.clear();
-                    enemies.add(new Enemy("Enemy 1", 12, 10));
+                    enemies.add(encounters.drawNormal(floor));
 
                     if (battle.fight(player, enemies, deck))
                     {
@@ -134,7 +119,7 @@ public class Main
                     break;
                 case "Elite":
                     enemies.clear();
-                    enemies.add(new Enemy("Elite", 30, 10));
+                    enemies.add(encounters.drawElite(floor));
 
                     if (battle.fight(player, enemies, deck))
                     {
