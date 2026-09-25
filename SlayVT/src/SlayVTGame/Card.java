@@ -52,7 +52,16 @@ public class Card
 
     public String getEffect()
     {
-        return effect.toString();
+        String description = effect.toString();
+        if (isRetain() && !description.contains("Retain."))
+        {
+            description += " Retain.";
+        }
+        if (isInnate() && !description.contains("Innate."))
+        {
+            description += " Innate.";
+        }
+        return description;
     }
 
     public boolean isExhaust()
@@ -63,6 +72,11 @@ public class Card
     public boolean isRetain()
     {
         return keywords.contains(CardKeyword.RETAIN);
+    }
+
+    public boolean isInnate()
+    {
+        return keywords.contains(CardKeyword.INNATE);
     }
 
     public boolean isUpgraded()

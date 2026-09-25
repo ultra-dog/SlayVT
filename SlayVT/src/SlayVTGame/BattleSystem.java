@@ -32,6 +32,7 @@ public class BattleSystem
             player.getBuffs().startTurn();
             player.setBlock(0);
             player.setEnergy(player.getMaxEnergy());
+            context.resolvePlayerTurnStart();
 
             while (piles.getHand().size() < 5)
             {

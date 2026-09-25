@@ -10,6 +10,15 @@ public class Buffs
     private boolean redHotForm;
     private boolean heatAppliedThisTurn;
     private int temporaryHeatMultiplier = 1;
+    private int frontFormTriggers;
+    private int frontFormUsed;
+    private int droughtBonusPercent;
+    private int phaseArmorBlock;
+    private boolean heatExchanger;
+    private boolean coldToHeatUsed;
+    private boolean heatToColdUsed;
+    private int noAcStacks;
+    private int coldAdaptationBlock;
 
     private boolean vulnerableAtTurnStart;
     private boolean weakAtTurnStart;
@@ -89,6 +98,80 @@ public class Buffs
         return temporaryHeatMultiplier;
     }
 
+    public void addFrontFormTriggers(int amount)
+    {
+        frontFormTriggers += amount;
+    }
+
+    public boolean useFrontFormTrigger()
+    {
+        if (frontFormUsed >= frontFormTriggers)
+        {
+            return false;
+        }
+        frontFormUsed++;
+        return true;
+    }
+
+    public void addDroughtBonus(int percent)
+    {
+        droughtBonusPercent += percent;
+    }
+
+    public void addPhaseArmor(int amount)
+    {
+        phaseArmorBlock += amount;
+    }
+
+    public int getPhaseArmorBlock()
+    {
+        return phaseArmorBlock;
+    }
+
+    public void enableHeatExchanger()
+    {
+        heatExchanger = true;
+    }
+
+    public boolean useHeatExchanger(boolean coldToHeat)
+    {
+        if (!heatExchanger)
+        {
+            return false;
+        }
+        if (coldToHeat && !coldToHeatUsed)
+        {
+            coldToHeatUsed = true;
+            return true;
+        }
+        if (!coldToHeat && !heatToColdUsed)
+        {
+            heatToColdUsed = true;
+            return true;
+        }
+        return false;
+    }
+
+    public void addNoAc()
+    {
+        noAcStacks++;
+    }
+
+    public int getNoAcStacks()
+    {
+        return noAcStacks;
+    }
+
+    public void addColdAdaptation(int amount)
+    {
+        coldAdaptationBlock += amount;
+    }
+
+    public int getColdAdaptationBlock()
+    {
+        return coldAdaptationBlock;
+    }
+
     public int getHeatEndTurnDamage(int heat)
     {
         int safeHeat = Math.max(heat, 0);
@@ -98,6 +181,7 @@ public class Buffs
             damage += safeHeat;
         }
         damage *= temporaryHeatMultiplier;
+        damage = damage * (100L + droughtBonusPercent) / 100;
         return damage > Integer.MAX_VALUE
             ? Integer.MAX_VALUE : (int)damage;
     }
@@ -184,6 +268,9 @@ public class Buffs
         vulnerableAtTurnStart = isVulnerable();
         weakAtTurnStart = isWeak();
         heatAppliedThisTurn = false;
+        frontFormUsed = 0;
+        coldToHeatUsed = false;
+        heatToColdUsed = false;
     }
 
     // Only statuses present at the start of the owner's turn lose duration.
@@ -213,6 +300,15 @@ public class Buffs
         redHotForm = false;
         heatAppliedThisTurn = false;
         temporaryHeatMultiplier = 1;
+        frontFormTriggers = 0;
+        frontFormUsed = 0;
+        droughtBonusPercent = 0;
+        phaseArmorBlock = 0;
+        heatExchanger = false;
+        coldToHeatUsed = false;
+        heatToColdUsed = false;
+        noAcStacks = 0;
+        coldAdaptationBlock = 0;
         vulnerableAtTurnStart = false;
         weakAtTurnStart = false;
     }
@@ -241,6 +337,37 @@ public class Buffs
         if (redHotForm)
         {
             description.add("Red Hot Form");
+        }
+
+        if (frontFormTriggers > 0)
+        {
+            description.add("Front Form: " + frontFormTriggers);
+        }
+
+        if (droughtBonusPercent > 0)
+        {
+            description.add("Drought: +" + droughtBonusPercent + "%");
+        }
+
+        if (phaseArmorBlock > 0)
+        {
+            description.add("Phase Armor: " + phaseArmorBlock);
+        }
+
+        if (heatExchanger)
+        {
+            description.add("Heat Exchanger");
+        }
+
+        if (noAcStacks > 0)
+        {
+            description.add("No AC: " + noAcStacks);
+        }
+
+        if (coldAdaptationBlock > 0)
+        {
+            description.add("Cold Adaptation: "
+                + coldAdaptationBlock);
         }
 
         if (temporaryHeatMultiplier > 1)

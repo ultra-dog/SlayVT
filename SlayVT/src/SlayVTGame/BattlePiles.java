@@ -16,7 +16,14 @@ public class BattlePiles
         clear();
         for (Card card : deck.getDeck())
         {
-            drawPile.add(card);
+            if (card.isInnate())
+            {
+                hand.add(card);
+            }
+            else
+            {
+                drawPile.add(card);
+            }
         }
     }
 

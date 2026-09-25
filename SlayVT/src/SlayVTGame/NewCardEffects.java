@@ -28,6 +28,16 @@ class HeatStrikeEffect implements CardEffect
     }
 
     @Override
+    public void apply(BattleContext context, Enemy enemy)
+    {
+        new DamageEffect(damage).apply(context.getPlayer(), enemy);
+        if (enemy.checkAlive())
+        {
+            TemperatureEffect.apply(context, enemy, heat, true);
+        }
+    }
+
+    @Override
     public String toString()
     {
         return "Deal " + damage + " damage. Apply " + heat + " Heat.";
@@ -97,6 +107,14 @@ class OverburnEffect implements CardEffect
         int amount = enemy.getBuffs().getTemperature() > 0
             ? hotAmount : otherAmount;
         TemperatureEffect.apply(player, enemy, amount, true);
+    }
+
+    @Override
+    public void apply(BattleContext context, Enemy enemy)
+    {
+        int amount = enemy.getBuffs().getTemperature() > 0
+            ? hotAmount : otherAmount;
+        TemperatureEffect.apply(context, enemy, amount, true);
     }
 
     @Override
@@ -176,7 +194,9 @@ class FrozenHeartEffect implements CardEffect
     @Override
     public void apply(BattleContext context, Enemy enemy)
     {
-        apply(context.getPlayer(), enemy);
+        TemperatureEffect.apply(context, context.getPlayer(), -2, false);
+        context.getPlayer().setEnergy(context.getPlayer().getEnergy()
+            + energy);
         context.drawCards(1);
     }
 
@@ -218,7 +238,7 @@ class ScatterIceEffect implements CardEffect
             if (enemy != target && enemy.checkAlive())
             {
                 TemperatureEffect.apply(
-                    context.getPlayer(), enemy, -spreadAmount, true);
+                    context, enemy, -spreadAmount, true);
             }
         }
     }
@@ -252,6 +272,16 @@ class VoidFreezeEffect implements CardEffect
     public void apply(Player player, Enemy enemy)
     {
         TemperatureEffect.apply(player, enemy, -cold, true);
+        if (enemy.checkAlive())
+        {
+            enemy.getBuffs().addWeak(weak);
+        }
+    }
+
+    @Override
+    public void apply(BattleContext context, Enemy enemy)
+    {
+        TemperatureEffect.apply(context, enemy, -cold, true);
         if (enemy.checkAlive())
         {
             enemy.getBuffs().addWeak(weak);

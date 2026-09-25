@@ -12,6 +12,26 @@ public final class TemperatureEffect
         int amount,
         boolean convertCooling)
     {
+        apply(null, player, target, amount, convertCooling);
+    }
+
+    public static void apply(
+        BattleContext context,
+        Character target,
+        int amount,
+        boolean convertCooling)
+    {
+        apply(context, context.getPlayer(), target, amount,
+            convertCooling);
+    }
+
+    private static void apply(
+        BattleContext context,
+        Player player,
+        Character target,
+        int amount,
+        boolean convertCooling)
+    {
         if (player == null || target == null)
         {
             throw new IllegalArgumentException(
@@ -26,6 +46,7 @@ public final class TemperatureEffect
             effectiveAmount = -amount;
         }
 
+        int previousTemperature = target.getBuffs().getTemperature();
         int temperatureDifference =
             target.getBuffs().setTemperature(effectiveAmount);
 
@@ -36,10 +57,28 @@ public final class TemperatureEffect
 
         if (temperatureDifference > 0)
         {
+            Buffs playerBuffs = player.getBuffs();
+            int multiplier = playerBuffs.useFrontFormTrigger() ? 2 : 1;
             int finalDamage = Buffs.calculateDamage(
-                temperatureDifference * 3,
-                player.getBuffs(), target.getBuffs());
+                temperatureDifference * 3 * multiplier,
+                playerBuffs, target.getBuffs());
             target.takeDamage(finalDamage);
+            player.addBlock(playerBuffs.getPhaseArmorBlock());
+
+            if (playerBuffs.useHeatExchanger(previousTemperature < 0))
+            {
+                if (previousTemperature < 0)
+                {
+                    if (context != null)
+                    {
+                        context.drawCards(2);
+                    }
+                }
+                else
+                {
+                    player.setEnergy(player.getEnergy() + 1);
+                }
+            }
         }
     }
 
