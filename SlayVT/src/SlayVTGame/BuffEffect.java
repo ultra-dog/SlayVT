@@ -1,6 +1,6 @@
 package SlayVTGame;
 
-public class BuffEffect implements CardEffect
+public class BuffEffect extends CardEffect
 {
     public enum BuffType
     {
@@ -67,6 +67,22 @@ public class BuffEffect implements CardEffect
                 TemperatureEffect.apply(player, target, amount, true);
                 break;
         }
+    }
+
+    @Override
+    public void apply(BattleContext context, Enemy enemy)
+    {
+        if (type != BuffType.TEMPERATURE)
+        {
+            apply(context.getPlayer(), enemy);
+            return;
+        }
+        if (targetEnemy && enemy == null)
+        {
+            throw new IllegalArgumentException("An enemy target is required.");
+        }
+        TemperatureEffect.apply(context,
+            targetEnemy ? enemy : context.getPlayer(), amount, true);
     }
 
     @Override

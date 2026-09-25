@@ -1,5 +1,5 @@
 package SlayVTGame;
-public class BlockEffect implements CardEffect
+public class BlockEffect extends CardEffect
 {
     //~ Fields ................................................................
     private int block; 

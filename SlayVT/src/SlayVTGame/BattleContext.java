@@ -44,6 +44,27 @@ public class BattleContext
         piles.drawToHand(amount);
     }
 
+    public void resolvePlayerTurnStart()
+    {
+        for (int i = 0; i < player.getBuffs().getNoAcStacks(); i++)
+        {
+            ArrayList<Enemy> living = new ArrayList<Enemy>();
+            for (Enemy enemy : enemies)
+            {
+                if (enemy.checkAlive())
+                {
+                    living.add(enemy);
+                }
+            }
+            if (living.isEmpty())
+            {
+                return;
+            }
+            Enemy target = living.get((int)(Math.random() * living.size()));
+            TemperatureEffect.apply(this, target, 1, true);
+        }
+    }
+
     public void resolvePlayerEndOfTurn()
     {
         for (Enemy enemy : enemies)
@@ -62,6 +83,18 @@ public class BattleContext
         int playerHeatDamage =
             Buffs.getBaseHeatEndTurnDamage(playerHeat);
         player.takeUnblockableDamage(playerHeatDamage);
+
+        int coldEnemies = 0;
+        for (Enemy enemy : enemies)
+        {
+            if (enemy.checkAlive()
+                && enemy.getBuffs().getTemperature() < 0)
+            {
+                coldEnemies++;
+            }
+        }
+        player.addBlock(coldEnemies
+            * player.getBuffs().getColdAdaptationBlock());
 
         player.getBuffs().endTurn();
     }

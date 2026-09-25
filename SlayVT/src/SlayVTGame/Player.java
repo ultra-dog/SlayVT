@@ -63,4 +63,15 @@ public class Player extends Character
         gold -= amount;
         return true;
     }
+
+    public void gainMaxHp(int amount)
+    {
+        if (amount < 0)
+        {
+            throw new IllegalArgumentException(
+                "Maximum HP gain must not be negative.");
+        }
+        maxHp += amount;
+        hp += amount;
+    }
 }
