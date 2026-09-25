@@ -20,7 +20,7 @@ The first command compiles all source and test classes into `build`; the second 
 
 ### Eclipse
 
-Import the `SlayVT` folder inside this repository as an **Existing Project into Workspace**. The project is configured for Java 8 and uses `src` as its source folder. Run `SlayVTGame.Main` as a Java application.
+Import the `SlayVT` folder inside this repository as an **Existing Project into Workspace**. The project is configured for Java 8 and uses `src` and `test` as source folders. Run `SlayVTGame.Main` as a Java application.
 
 ## How to play
 
@@ -37,7 +37,9 @@ java -cp build SlayVTGame.CardMechanicsTest
 java -cp build SlayVTGame.TemperatureTest
 ```
 
-Other test classes are in `SlayVT/src/SlayVTGame/` and end in `Test.java`. `SourceLayoutTest` additionally needs the absolute path to `SlayVT/src` as its argument. These tests are not JUnit tests; conversion to JUnit remains work for the final deliverable.
+Other standalone test classes are in `SlayVT/src/SlayVTGame/` and end in `Test.java`. `SourceLayoutTest` additionally needs the absolute path to `SlayVT/src` as its argument.
+
+JUnit 4 tests are in `SlayVT/test/SlayVTGame/`. In Eclipse, right-click `CoreGameplayJUnitTest.java` and choose **Run As > JUnit Test**. The project's `lib` folder includes the JUnit and Hamcrest jars used by these tests, so no Eclipse JUnit container setup is needed. The test suite covers normal and invalid input for damage, shop purchases, shop card removal, and deck card removal.
 
 ## System diagram
 
@@ -50,3 +52,4 @@ Other test classes are in `SlayVT/src/SlayVTGame/` and end in `Test.java`. `Sour
 - `SlayVT/src/SlayVTGame/BattleSystem.java` — turn-based battles.
 - `SlayVT/src/SlayVTGame/TemperatureEffect.java` — Heat/Cold reversal damage.
 - `SlayVT/src/SlayVTGame/*Test.java` — current executable tests.
+- `SlayVT/test/SlayVTGame/CoreGameplayJUnitTest.java` — JUnit 4 gameplay tests.

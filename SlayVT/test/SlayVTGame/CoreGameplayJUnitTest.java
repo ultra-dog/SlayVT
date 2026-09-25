@@ -44,6 +44,26 @@ public class CoreGameplayJUnitTest
     }
 
     @Test
+    public void shopRemovalChargesGoldAndShrinksDeck()
+    {
+        Player player = new Player("Tester", 80);
+        Deck deck = new Deck(1);
+        ShopSystem shop = new ShopSystem();
+
+        assertTrue(shop.removeCard(player, deck, deck.getDeck()[0]));
+        assertEquals(24, player.getGold());
+        assertEquals(11, deck.size());
+        assertEquals(100, shop.getRemovalCost());
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void nullShopRemovalCardIsRejected()
+    {
+        new ShopSystem().removeCard(
+            new Player("Tester", 80), new Deck(1), null);
+    }
+
+    @Test
     public void removingOwnedCardShrinksDeck()
     {
         Deck deck = new Deck(1);
